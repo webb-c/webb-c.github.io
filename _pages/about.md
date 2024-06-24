@@ -11,7 +11,7 @@ redirect_from:
 
 I am an _undergraduate research intern at Connected Intelligence lab in Konkuk University_. I received a B.S. in Computer Science and Engineering from Konkuk University. My research interests focus on quantum computing algorithm design and its applications.
 
-Here is my [CV](http://academicpages.github.io/files/CV.pdf) (Last update: June 2024).
+Here is my [CV](http://webb-c.github.io/files/CV.pdf) (Last update: June 2024).
 
 <br>
 

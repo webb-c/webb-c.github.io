@@ -24,7 +24,7 @@ Email: webb41@kaist.ac.kr
 
 
 ## Recent Publications
-Click [here](http://localhost:4000/publications/) for full list.
+Click [here](http://webb-c.github.io/publications/) for full list.
 <ul>{% for post in site.publications reversed %}
   {% include archive-single-cv.html %}
 {% endfor %}</ul>

@@ -15,7 +15,7 @@ redirect_from:
 I am an _undergraduate research intern at Connected Intelligence lab in Konkuk University_.  
 I received a B.S. in Computer Science and Engineering from Konkuk University. My research interests focus on quantum computing algorithm design and its applications.
 
-Here is my [CV](http://webb-c.github.io/files/CV.pdf) (Last update: June 2024).
+Here is my [CV](http://webb-c.github.io/files/CV.pdf) (Last update: August 2024).
 
 
 ## Contact
@@ -33,8 +33,10 @@ Click [here](http://webb-c.github.io/publications/) for full list.
 ## Research experiences
 
 **Research Assistant, KAIST**  
-_Lab_, August 2024 ~
+_Quantum Information and Communication Lab (QuIC)_, August 2024 ~
 
+
+<br>
 
 **Undergraduate Research Assistant, Konkuk University**  
 _Connected Intelligence Lab (CoIn)_, August 2022 ~ May 2024

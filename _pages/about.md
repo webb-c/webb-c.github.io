@@ -12,10 +12,10 @@ redirect_from:
 
 ## About Me
 
-I am a _research assistant at Quantum Information and Communication Lab in KAIST_.  
-I received a B.S. in Computer Science and Engineering from Konkuk University. My research interests focus on quantum computing algorithm design and its applications.
+I am a _research assistant at QIT Lab in KAIST_.  
+I received a B.S. in Computer Science and Engineering from Konkuk University. My research interests focus on theoretical computer science: quantum computing algorithms and complexity theory.
 
-Here is my [CV](http://webb-c.github.io/files/CV.pdf) (Last update: August 2024).
+Here is my [CV](http://webb-c.github.io/files/CV.pdf) (Last update: January 2025).
 
 
 ## Contact
@@ -33,12 +33,12 @@ Click [here](http://webb-c.github.io/publications/) for full list.
 ## Research experiences
 
 **Research Assistant, KAIST**  
-_Quantum Information and Communication Lab (QuIC)_, August 2024 ~
+_QIT Lab, Dept of Physics_, February 2025 ~
 
 
 <br>
 
 **Undergraduate Research Assistant, Konkuk University**  
-_Connected Intelligence Lab (CoIn)_, August 2022 ~ May 2024
+_Connected Intelligence Lab (CoIn), Dept of Computer Science and Engineering_, August 2022 ~ May 2024
 - Develop algorithm for partitioning and offloading the computation tasks of deep neural networks
 - Studying Lyapunov Optimization, Deep Learning and Reinforcement Learning

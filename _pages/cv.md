@@ -11,7 +11,7 @@ redirect_from:
 
 Education
 ======
-* M.S. @ EE, KAIST, Republic of Korea, Expected 2026
+* Ph.D. @ EE, KAIST, Republic of Korea, Expected ?
 * B.S. @ CSE, Konkuk University, Republic of Korea, 2024
 
 Work experience

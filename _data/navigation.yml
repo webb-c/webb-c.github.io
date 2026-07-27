@@ -3,6 +3,9 @@ main:
   - title: "Publications"
     url: /publications/
 
+  - title: "Slides"
+    url: /slides/
+
   - title: "Blog Posts"
     url: https://webb-c.tistory.com/
   # - title: "Talks"

@@ -15,7 +15,7 @@ redirect_from:
 I am a _research assistant at QIT Lab in KAIST_.  
 I received a B.S. in Computer Science and Engineering from Konkuk University. My research interests focus on theoretical computer science: quantum computing algorithms and complexity theory.
 
-Here is my [CV](http://webb-c.github.io/files/CV.pdf) (Last update: January 2025).
+Here is my [CV](http://webb-c.github.io/files/CV.pdf) (Last update: August 2026).
 
 
 ## Contact

@@ -1,0 +1,46 @@
+---
+layout: base
+---
+{%- assign profile = site.data.profile -%}
+{%- assign words = content | number_of_words -%}
+{%- assign minutes = words | divided_by: 200 | plus: 1 -%}
+{%- assign cat = page.categories | first -%}
+<article>
+  <header class="post-head">
+    <p class="crumbs"><a href="{{ '/blog/' | relative_url }}">Blog</a>{% if cat %} / <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}</p>
+    <h1>{{ page.title }}</h1>
+    <p class="meta">{{ page.date | date: "%Y.%m.%d" }} · {{ profile.name }} · {{ minutes }} min read{% if cat %} · Filed under <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}</p>
+  </header>
+
+  {%- if page.series -%}
+  {%- assign parts = site.posts | where: "series", page.series | sort: "date" -%}
+  <aside class="series-box">
+    <span class="eyebrow">Series</span> {{ page.series }}
+    <ol>{% for p in parts %}<li>{% if p.url == page.url %}<strong>{{ p.title }}</strong>{% else %}<a href="{{ p.url | relative_url }}">{{ p.title }}</a>{% endif %}</li>{% endfor %}</ol>
+  </aside>
+  {%- endif -%}
+
+  <div class="post-body">
+    {{ content }}
+  </div>
+
+  {% if page.tags.size > 0 %}
+  <div class="tags"><span class="label">Tags</span>{% for t in page.tags %}<a href="{{ '/blog/archive/' | relative_url }}#tag-{{ t | slugify }}">{{ t }}</a>{% endfor %}</div>
+  {% endif %}
+</article>
+
+<nav class="post-nav" aria-label="More posts">
+  {% if page.previous %}<a href="{{ page.previous.url | relative_url }}">← {{ page.previous.title }}</a>{% else %}<span class="none">← No older posts</span>{% endif %}
+  {% if page.next %}<a href="{{ page.next.url | relative_url }}">{{ page.next.title }} →</a>{% else %}<a href="{{ '/blog/' | relative_url }}">All posts →</a>{% endif %}
+</nav>
+
+{% if site.giscus.repo != "" and site.giscus.repo and page.comments != false %}
+<section class="comments" aria-labelledby="h-comments">
+  <h2 id="h-comments">Comments</h2>
+  <script src="https://giscus.app/client.js"
+    data-repo="{{ site.giscus.repo }}" data-repo-id="{{ site.giscus.repo_id }}"
+    data-category="{{ site.giscus.category }}" data-category-id="{{ site.giscus.category_id }}"
+    data-mapping="pathname" data-reactions-enabled="1" data-input-position="bottom"
+    data-theme="preferred_color_scheme" data-lang="en" crossorigin="anonymous" async></script>
+</section>
+{% endif %}

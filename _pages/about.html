@@ -1,0 +1,83 @@
+---
+layout: page
+title: About me
+permalink: /about/
+nav: about
+board: true
+hide_title: true
+redirect_from:
+  - /cv/
+---
+{%- assign profile = site.data.profile -%}
+{%- comment -%}
+  Name, links, bio, experience and education come from _data/profile.yml.
+  Edit the longer text of the Bio section directly below.
+{%- endcomment -%}
+
+<div class="about-head">
+  {%- comment -%}
+  PHOTO — hidden for now. To show it: put your picture in /images/ (e.g. images/profile.jpg),
+  fix the file name in the img line below, and delete the two "comment" lines that wrap this block.
+
+  <img class="photo" src="{{ '/images/profile.png' | relative_url }}" alt="{{ profile.name }}">
+  {%- endcomment -%}
+  <div>
+    <h1>About me</h1>
+    <p class="lede">{{ profile.name }} · {{ profile.role }}, {{ profile.affiliation }} · {{ profile.location }}</p>
+    <div class="btn-row">
+      <a class="btn btn--primary" href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">CV (PDF) ↗</a>
+      <a class="btn" href="mailto:{{ profile.email }}">Email</a>
+      <a class="btn" href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Scholar ↗</a>
+      <a class="btn" href="{{ profile.links.github }}" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </div>
+</div>
+
+<div class="section--tight" style="margin-top: 44px">
+  {% include board.html level="about" fig="Figure 0." caption="About, as a board. Push [win] up the column — bio, CV or contact opens. The gates along the bottom lead to the other pages." %}
+</div>
+
+<section id="bio" class="section split" aria-labelledby="h-bio">
+  <div class="split__main">
+    <h2 id="h-bio" class="section-title"><span class="num">1</span>Bio</h2>
+    <div class="prose">
+      <p>{{ profile.bio }}</p>
+      <!-- Add more paragraphs here: how you got here, what you are working on now. -->
+    </div>
+  </div>
+  <aside class="split__aside">
+    <p class="eyebrow">Interests</p>
+    <p>{{ profile.interests | join: " · " }}</p>
+    <p class="eyebrow">Recent topics</p>
+    <p>{{ profile.recent_topics | join: " · " }}</p>
+  </aside>
+</section>
+
+<section class="section" aria-labelledby="h-exp" style="max-width: 760px">
+  <h2 id="h-exp" class="section-title"><span class="num">2</span>Research experience</h2>
+  <ul class="rows" style="list-style: none; padding: 0">
+    {% for e in profile.experience %}
+    <li class="row"><p class="row__when">{{ e.dates }}</p><div><p class="row__title">{{ e.title }}</p>{% if e.detail %}<p class="row__text">{{ e.detail }}</p>{% endif %}</div></li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="section" aria-labelledby="h-edu" style="max-width: 760px; margin-top: 56px">
+  <h2 id="h-edu" class="section-title"><span class="num">3</span>Education</h2>
+  <ul class="rows" style="list-style: none; padding: 0">
+    {% for e in profile.education %}
+    <li class="row"><p class="row__when">{{ e.dates }}</p><div><p class="row__title" style="font-weight: 400">{{ e.title }}</p>{% if e.detail %}<p class="row__text">{{ e.detail }}</p>{% endif %}</div></li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section id="contact" class="section measure" aria-labelledby="h-contact" style="margin-top: 56px">
+  <h2 id="h-contact" class="section-title"><span class="num">4</span>Contact</h2>
+  <dl class="kv">
+    <dt>Email</dt><dd><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></dd>
+    <dt>Office</dt><dd>{{ profile.affiliation }} · {{ profile.location }}</dd>
+    <dt>Scholar</dt><dd><a href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Google Scholar profile</a></dd>
+    <dt>GitHub</dt><dd><a href="{{ profile.links.github }}" target="_blank" rel="noopener">{{ profile.links.github | remove: "https://" }}</a></dd>
+    <dt>CV</dt><dd><a href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">PDF</a>{% if profile.links.cv_updated %} <span class="meta" style="display: inline">(updated {{ profile.links.cv_updated }})</span>{% endif %}</dd>
+  </dl>
+</section>

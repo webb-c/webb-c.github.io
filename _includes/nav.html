@@ -1,0 +1,15 @@
+{%- assign profile = site.data.profile -%}
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-header__brand" href="{{ '/' | relative_url }}">{{ profile.name }}</a>
+    <nav class="site-nav" aria-label="Site">
+      {%- assign items = "about:About:/about/,publications:Publications:/publications/,talks:Talks:/talks/,blog:Blog:/blog/" | split: "," -%}
+      {%- for item in items -%}
+        {%- assign parts = item | split: ":" -%}
+        <a href="{{ parts[2] | relative_url }}"{% if page.nav == parts[0] %} aria-current="page"{% endif %}>{{ parts[1] }}</a>
+      {%- endfor -%}
+      <a class="site-nav__quiet" href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">CV ↗</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch colour theme"><span data-theme-label>Dark mode</span></button>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,117 @@
+# ---------------------------------------------------------------------------
+# Puzzle boards. Every board is an 18 × 9 grid: x = 0–17 (left → right),
+# y = 0–8 (top → bottom). The bottom row (y = 8) holds the gates.
+#
+# The rules are Baba Is You's. A rule is NOUN IS PROPERTY (or NOUN IS NOUN),
+# read left → right or top → bottom; AND joins words ("star and wall is push").
+#   Nouns (blue):        WEBB STAR WALL PAPER BIO CV MAIL SLIDE
+#   Verb (orange):       IS   (and AND)
+#   Properties (green):  YOU  WIN  STOP  PUSH  DEFEAT  SINK
+#   Publications only:   1 2 3 … (which selected paper) and ARXIV / PUB (where it opens)
+# Text is always pushable. You win the moment something that is YOU stands on
+# something that is WIN — itself included ("webb is win" while webb is you).
+# NOUN IS NOUN turns one kind of object into another (star is wall).
+#
+# Words: [WORD, x, y].
+# Objects: kind is one of star, wall, paper, bio, cv, mail, slide. When an
+# object you win on has a `url`, the win card offers to open it (Enter);
+# `message` is shown instead when there is no link.
+# ---------------------------------------------------------------------------
+
+# Present on every board, top-left.
+you:
+  - [WEBB, 1, 1]
+  - [IS, 2, 1]
+  - [YOU, 3, 1]
+
+# The gates along the bottom row. Stand on one and press Enter.
+gates:
+  - { id: home, letter: H, label: Home, x: 2, url: / }
+  - { id: about, letter: A, label: About, x: 5, url: /about/ }
+  - { id: publications, letter: P, label: Publications, x: 9, url: /publications/ }
+  - { id: talks, letter: T, label: Talks, x: 12, url: /talks/ }
+  - { id: blog, letter: B, label: Blog, x: 15, url: /blog/ }
+
+# First visit to Home: the welcome screen inside Figure 0.
+welcome:
+  label: "Before you start"
+  text: "This site is a small puzzle. Its rules are written as words — [webb is you], [star is win] — and every word can be pushed. Change a sentence and you change what is true; reach a win and a page opens."
+  question: "Have you played a puzzle like this before?"
+  choices:
+    - "Yes — take me to the map."
+    - "Not yet — show me how (about a minute)."
+    - "Skip the game — I would rather just read."
+
+# Choice (b) on the welcome screen. Any win clears a lesson.
+tutorial:
+  - title: Moving
+    hint: "Because [webb is you], the keys W A S D move webb. Walk onto the star — [star is win]."
+    webb: [5, 4]
+    words: [[STAR, 1, 7], [IS, 2, 7], [WIN, 3, 7]]
+    objects:
+      - { kind: star, x: 12, y: 4 }
+    done: { title: "Lesson 1 complete.", text: "Rules are just words lying on the board.", action: "Next lesson →" }
+  - title: Pushing
+    hint: "Words are blocks you can push. Push [win] up into the gap so the sentence reads [star is win], then walk onto the star."
+    webb: [5, 7]
+    words: [[STAR, 6, 2], [IS, 7, 2], [WIN, 8, 5]]
+    objects:
+      - { kind: star, x: 13, y: 5 }
+    done: { title: "Lesson 2 complete.", text: "Move the words, and the rules move with them.", action: "Next lesson →" }
+  - title: Breaking rules
+    hint: "[wall is stop] keeps you out. Push one of its words out of line to break the rule, then reach the star."
+    webb: [5, 4]
+    words: [[STAR, 1, 3], [IS, 2, 3], [WIN, 3, 3], [WALL, 2, 6], [IS, 3, 6], [STOP, 4, 6]]
+    wall_column: 10
+    objects:
+      - { kind: star, x: 14, y: 4 }
+    done: { title: "Tutorial complete.", text: "Every board on this site works the same way, and any sentence you can spell is a rule — even [webb is win]. The gates along the bottom take you from page to page.", action: "To the map →" }
+
+# One board per page. `here` is the gate drawn as “you are here”;
+# `spawn` is the gate column webb starts on.
+levels:
+  home:
+    here: home
+    spawn: 2
+    hint: "Push [win] up into the gap so that [star is win] holds, then walk onto the star. Gates along the bottom lead to every page."
+    words: [[STAR, 6, 1], [IS, 7, 1], [WIN, 8, 3]]
+    objects:
+      - kind: star
+        x: 12
+        y: 2
+        caption: "warm-up"
+        label: "The star"
+        message: "That is the whole idea. Every board on this site works the same way — and the gates take you around."
+        action: "Done"
+
+  about:
+    here: about
+    spawn: 5
+    hint: "Push [win] up the column to finish one of the sentences, then walk onto that object — or walk to a gate and press Enter."
+    words: [[BIO, 6, 1], [IS, 7, 1], [CV, 6, 3], [IS, 7, 3], [MAIL, 6, 5], [IS, 7, 5], [WIN, 8, 6]]
+    objects:
+      - { kind: bio, x: 12, y: 1, caption: "Bio", label: "Bio", url: "#bio", action: "Read the bio ↓" }
+      - { kind: cv, x: 12, y: 3, caption: "CV", label: "CV", url: "/files/CV.pdf", external: true, action: "Open the CV (PDF) ↗" }
+      - { kind: mail, x: 12, y: 5, caption: "Contact", label: "Contact", url: "#contact", action: "Go to contact ↓" }
+
+  # One paper on the board. The words [1] [2] … are the selected papers listed
+  # under the board (_publications/*.md with `selected: 1`, `selected: 2`, …).
+  # [paper is 1] picks the paper, [paper is arxiv] or [paper is pub] picks
+  # where it opens; then walk onto the paper.
+  publications:
+    here: publications
+    spawn: 9
+    hint: "Make [paper is 1] (or 2) to pick a paper from the list below, and [paper is arxiv] or [paper is pub] to pick where it opens. Then walk onto the paper."
+    words: [[PAPER, 5, 2], [IS, 6, 2], [IS, 5, 3], [ARXIV, 3, 6], [PUB, 6, 6]]
+    auto: papers
+    number_slots: [[8, 5], [10, 4], [12, 6]]   # where [1] [2] [3] start
+    object: [12, 2]
+
+  # Objects come from _talks/*.md files that have `slides:` (newest three).
+  talks:
+    here: talks
+    spawn: 12
+    hint: "Push [win] left to make [slide is win], then walk onto the screen — or walk to a gate and press Enter."
+    words: [[SLIDE, 5, 3], [IS, 6, 3], [WIN, 9, 3]]
+    auto: talks
+    slots: [[13, 2], [13, 4], [13, 6]]

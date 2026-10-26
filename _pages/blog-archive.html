@@ -1,0 +1,57 @@
+---
+layout: base
+title: All posts
+permalink: /blog/archive/
+nav: blog
+---
+{%- assign by_month = site.posts | group_by_exp: "p", "p.date | date: '%B %Y'" -%}
+{%- assign series = site.posts | where_exp: "p", "p.series" | group_by: "series" -%}
+{%- include blog-head.html current="archive" -%}
+
+<nav class="tabs-jump" aria-label="Jump to">
+  <a href="#by-date">By date</a>
+  <a href="#by-category">By category</a>
+  <a href="#by-tag">By tag</a>
+  <a href="#series">Series</a>
+</nav>
+
+<div style="max-width: 760px">
+  <section id="by-date" class="group">
+    <h2>By date <span class="n">({{ site.posts.size }})</span></h2>
+    {% for m in by_month %}
+    <h3 id="{{ m.name | slugify }}">{{ m.name }}</h3>
+    <ol class="post-list">{% for p in m.items %}{% include post-row.html post=p %}{% endfor %}</ol>
+    {% else %}
+    <p class="empty">No posts yet.</p>
+    {% endfor %}
+  </section>
+
+  <section id="by-category" class="group">
+    <h2>By category</h2>
+    {% assign cats = site.categories | sort %}
+    {% for c in cats %}
+    <h3 id="cat-{{ c[0] | slugify }}">{{ c[0] }} <span class="meta" style="display: inline">({{ c[1].size }})</span></h3>
+    <ol class="post-list">{% for p in c[1] %}{% include post-row.html post=p %}{% endfor %}</ol>
+    {% endfor %}
+  </section>
+
+  <section id="by-tag" class="group">
+    <h2>By tag</h2>
+    {% assign tags = site.tags | sort %}
+    {% for t in tags %}
+    <h3 id="tag-{{ t[0] | slugify }}">{{ t[0] }} <span class="meta" style="display: inline">({{ t[1].size }})</span></h3>
+    <ol class="post-list">{% for p in t[1] %}{% include post-row.html post=p %}{% endfor %}</ol>
+    {% endfor %}
+  </section>
+
+  <section id="series" class="group">
+    <h2>Series</h2>
+    {% for s in series %}
+    {% assign parts = s.items | sort: "date" %}
+    <h3 id="series-{{ s.name | slugify }}">{{ s.name }} <span class="meta" style="display: inline">({{ s.size }})</span></h3>
+    <ol class="post-list">{% for p in parts %}{% include post-row.html post=p %}{% endfor %}</ol>
+    {% else %}
+    <p class="meta" style="margin-top: 10px">No series yet. Give posts the same <code>series:</code> in their front matter to group them here.</p>
+    {% endfor %}
+  </section>
+</div>

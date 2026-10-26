@@ -1,0 +1,19 @@
+{%- comment -%}
+  One paper: authors. title. venue, year. + links.  Used by Publications and Home.
+  include paper-ref.html paper=p   (bibtex=true adds a fold-out BibTeX box)
+{%- endcomment -%}
+{%- assign p = include.paper -%}
+{%- assign me = site.data.profile.name -%}
+{%- if p.doi -%}{%- assign pub = p.doi | prepend: "https://doi.org/" -%}{%- else -%}{%- assign pub = p.published -%}{%- endif -%}
+{%- if p.arxiv -%}{%- assign main = p.arxiv | prepend: "https://arxiv.org/abs/" -%}{%- else -%}{%- assign main = pub -%}{%- endif -%}
+<p class="pub__cite">{% for a in p.authors %}{% if a == me %}<strong>{{ a }}</strong>{% else %}{{ a }}{% endif %}{% unless forloop.last %}, {% endunless %}{% endfor %}. <span class="pub__title">{% if main %}<a href="{{ main }}" target="_blank" rel="noopener">{{ p.title }}</a>{% else %}{{ p.title }}{% endif %}</span>. <em>{{ p.venue }}</em>, {{ p.date | date: "%Y" }}.</p>
+<div class="pub__meta">
+  {%- if include.type %}<span class="pub__type">{{ p.type }}</span>{% endif %}
+  {%- if p.arxiv %}<a href="https://arxiv.org/abs/{{ p.arxiv }}" target="_blank" rel="noopener">arXiv</a>{% endif %}
+  {%- if p.pdf %}<a href="{{ p.pdf }}" target="_blank" rel="noopener">PDF</a>{% elsif p.arxiv %}<a href="https://arxiv.org/pdf/{{ p.arxiv }}" target="_blank" rel="noopener">PDF</a>{% endif %}
+  {%- if pub %}<a href="{{ pub }}" target="_blank" rel="noopener">Published</a>{% endif %}
+  {%- if p.code %}<a href="{{ p.code }}" target="_blank" rel="noopener">Code</a>{% endif %}
+  {%- if include.bibtex and p.bibtex %}
+  <details class="pub__bib"><summary>BibTeX</summary><pre class="bib">{{ p.bibtex | strip | escape }}</pre></details>
+  {%- endif %}
+</div>

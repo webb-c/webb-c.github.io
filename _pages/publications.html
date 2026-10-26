@@ -1,0 +1,77 @@
+---
+layout: page
+title: Publications
+permalink: /publications/
+nav: publications
+board: true
+hide_title: true
+redirect_from:
+  - /publication/First
+  - /publication/Second
+  - /publication/2024-06-25-LRLO
+---
+{%- comment -%}
+  Built from _publications/*.md (one file per paper).
+  `selected: 1`, `selected: 2`, … in a paper's front matter puts it in “Selected”
+  under that number — the same number as the [1] [2] words on the board.
+{%- endcomment -%}
+{%- assign profile = site.data.profile -%}
+{%- assign papers = site.publications | sort: "date" | reverse -%}
+{%- assign by_year = papers | group_by_exp: "p", "p.date | date: '%Y'" -%}
+{%- assign n_pre = papers | where: "type", "preprint" | size -%}
+{%- assign n_jour = papers | where: "type", "journal" | size -%}
+{%- assign n_conf = papers | where: "type", "conference" | size -%}
+
+<div class="page-head">
+  <h1>Publications</h1>
+  <p class="lede">Selected papers first{% if site.puzzles %} — they are also playable in Figure 1{% endif %}. The complete list follows, newest first. Also on <a href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Google Scholar</a>.</p>
+</div>
+
+<section class="section" aria-labelledby="h-sel" style="margin-top: 56px">
+  <h2 id="h-sel" class="section-title"><span class="num">1</span>Selected</h2>
+  {% if site.puzzles %}
+  <p class="prose measure" style="margin: 14px 0 0">Each selected paper has a number. On the board, <span class="rule"><span class="rw rw--s">paper</span><span class="rw rw--v">is</span><span class="rw rw--d">[1]</span></span> picks paper [1] below, and <span class="rule"><span class="rw rw--s">paper</span><span class="rw rw--v">is</span><span class="rw rw--d">arxiv</span></span> or <span class="rule"><span class="rw rw--s">paper</span><span class="rw rw--v">is</span><span class="rw rw--d">pub</span></span> picks where it opens.</p>
+  <div style="margin-top: 26px">
+    {% include board.html level="publications" fig="Figure 1." caption="Selected papers. Make [paper is 1] and [paper is arxiv] (one across, one down), then walk onto the paper. The gates along the bottom lead to the other pages." %}
+  </div>
+  {% endif %}
+  <ol class="pubs measure-wide" style="margin-top: 30px">
+    {%- for n in (1..9) -%}{%- for p in site.publications -%}{%- if p.selected == n %}
+    <li class="pub" id="selected-{{ n }}">
+      <span class="pub__n">[{{ n }}]</span>
+      <div>
+        {% include paper-ref.html paper=p bibtex=true %}
+        {% if p.summary %}<p class="pub__summary">{{ p.summary }}</p>{% endif %}
+      </div>
+    </li>
+    {%- endif -%}{%- endfor -%}{%- endfor %}
+  </ol>
+</section>
+
+<section class="section measure-wide" aria-labelledby="h-all">
+  <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px">
+    <h2 id="h-all" class="section-title"><span class="num">2</span>All papers</h2>
+    <div class="filters" role="group" aria-label="Filter papers" data-pub-filters hidden>
+      <button type="button" data-filter="all" aria-pressed="true">All <span class="count">{{ papers.size }}</span></button>
+      {% if n_pre > 0 %}<button type="button" data-filter="preprint" aria-pressed="false">Preprints <span class="count">{{ n_pre }}</span></button>{% endif %}
+      {% if n_jour > 0 %}<button type="button" data-filter="journal" aria-pressed="false">Journal <span class="count">{{ n_jour }}</span></button>{% endif %}
+      {% if n_conf > 0 %}<button type="button" data-filter="conference" aria-pressed="false">Conference <span class="count">{{ n_conf }}</span></button>{% endif %}
+    </div>
+  </div>
+
+  {% for year in by_year %}
+  <div data-pub-year>
+    <p class="year-label">{{ year.name }}</p>
+    <ul class="pubs pubs--plain">
+      {% for p in year.items %}
+      <li class="pub pub--plain" data-pub data-type="{{ p.type }}">
+        <div>
+          {% include paper-ref.html paper=p type=true bibtex=true %}
+          {% if p.selected %}<p class="meta" style="margin-top: 4px">Selected [{{ p.selected }}]</p>{% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endfor %}
+</section>

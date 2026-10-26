@@ -1,0 +1,27 @@
+{%- comment -%}
+  A puzzle board. Use it as:  include board.html level="about" fig="Figure 0." caption="… [win] …"
+  level   = a key under `levels:` in _data/puzzles.yml (home, about, publications, talks)
+  intro   = "auto" shows the welcome screen on a first visit (Home only)
+  caption = figure caption; words in [square brackets] become coloured rule blocks
+{%- endcomment -%}
+{%- if site.puzzles -%}
+{%- assign P = site.data.puzzles -%}
+{%- assign talks_sorted = site.talks | sort: "date" | reverse -%}
+<figure class="board" data-board data-level="{{ include.level }}" data-intro="{{ include.intro | default: 'off' }}">
+  <div class="board__mount"></div>
+  {%- if include.caption %}
+  <figcaption class="board__caption" data-caption><strong>{{ include.fig }}</strong> {{ include.caption }}</figcaption>
+  {%- endif %}
+  <script type="application/json" class="board__data">
+  {
+    "you": {{ P.you | jsonify }},
+    "gates": {{ P.gates | jsonify }},
+    "welcome": {{ P.welcome | jsonify }},
+    "tutorial": {{ P.tutorial | jsonify }},
+    "level": {{ P.levels[include.level] | jsonify }},
+    "papers": [{% assign k = 0 %}{% for n in (1..9) %}{% for p in site.publications %}{% if p.selected == n %}{% if k > 0 %}, {% endif %}{% assign k = k | plus: 1 %}{% if p.doi %}{% assign pub = p.doi | prepend: "https://doi.org/" %}{% else %}{% assign pub = p.published %}{% endif %}{"n": {{ n }}, "label": {{ p.short_title | default: p.title | jsonify }}, "title": {{ p.title | jsonify }}, "arxiv": {% if p.arxiv %}{{ p.arxiv | prepend: "https://arxiv.org/abs/" | jsonify }}{% else %}null{% endif %}, "pub": {% if pub %}{{ pub | jsonify }}{% else %}null{% endif %}}{% endif %}{% endfor %}{% endfor %}],
+    "talks": [{% assign n = 0 %}{% for t in talks_sorted %}{% if t.slides and n < 3 %}{% if n > 0 %}, {% endif %}{"label": {{ t.short_title | default: t.event | jsonify }}, "year": {{ t.date | date: "%Y" | jsonify }}, "url": {{ t.slides | jsonify }}}{% assign n = n | plus: 1 %}{% endif %}{% endfor %}]
+  }
+  </script>
+</figure>
+{%- endif -%}

@@ -1,16 +1,47 @@
 ---
-layout: archive
-title: "Talks and presentations"
+layout: page
+title: Talks
 permalink: /talks/
-author_profile: true
+nav: talks
+board: true
+hide_title: true
+redirect_from:
+  - /slides/
 ---
+{%- comment -%}
+  Built from _talks/*.md (one file per talk). A talk dated after today is listed as upcoming.
+{%- endcomment -%}
+{%- assign talks = site.talks | sort: "date" | reverse -%}
+{%- assign now = site.time | date: "%s" | plus: 0 -%}
 
-{% if site.talkmap_link == true %}
+<div class="page-head">
+  <h1>Talks</h1>
+  <p class="lede">Talks and presentations, newest first. Slides are linked where available.</p>
+</div>
 
-<p style="text-decoration:underline;"><a href="/talkmap.html">See a map of all the places I've given a talk!</a></p>
-
+{% if site.puzzles %}
+<div class="section--tight" style="margin-top: 44px">
+  {% include board.html level="talks" fig="Figure 0." caption="Talks, as a board. Push [win] left to make [slide is win], then stand on the screen and press Enter for the slides. The gates along the bottom lead to the other pages." %}
+</div>
 {% endif %}
 
-{% for post in site.talks reversed %}
-  {% include archive-single-talk.html %}
-{% endfor %}
+{%- capture upcoming -%}{% for t in talks %}{% assign ts = t.date | date: "%s" | plus: 0 %}{% if ts > now %}{% include talk.html talk=t %}{% endif %}{% endfor %}{%- endcapture -%}
+{% if upcoming != "" %}
+<section class="section" aria-labelledby="h-up" style="max-width: 760px; margin-top: 56px">
+  <h2 id="h-up" class="section-title">Upcoming</h2>
+  <div style="margin-top: 22px">{{ upcoming }}</div>
+</section>
+{% endif %}
+
+<section class="section" aria-labelledby="h-past" style="max-width: 760px; margin-top: 56px">
+  <h2 id="h-past" class="section-title">Past</h2>
+  {% assign last_year = "" %}
+  {% for t in talks %}
+    {% assign ts = t.date | date: "%s" | plus: 0 %}
+    {% if ts <= now %}
+      {% assign y = t.date | date: "%Y" %}
+      {% if y != last_year %}<p class="year-label">{{ y }}</p>{% assign last_year = y %}{% endif %}
+      {% include talk.html talk=t %}
+    {% endif %}
+  {% endfor %}
+</section>

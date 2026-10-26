@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}" data-baseurl="{{ site.baseurl }}">
+<head>
+  {% include head.html %}
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  {% include nav.html %}
+  <main id="main" class="wrap">
+    {{ content }}
+    {% include footer.html %}
+  </main>
+  <script src="{{ '/assets/js/site.js' | relative_url }}" defer></script>
+  {% if page.board and site.puzzles %}<script src="{{ '/assets/js/puzzle.js' | relative_url }}" defer></script>{% endif %}
+  {% if page.math %}
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js" defer></script>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,31 @@
+{%- assign by_month = site.posts | group_by_exp: "p", "p.date | date: '%B %Y'" -%}
+{%- assign series = site.posts | where_exp: "p", "p.series" | group_by: "series" -%}
+<aside class="blog__side" aria-label="Blog sidebar">
+  <div>
+    <label class="eyebrow" for="blog-search" style="display: block">Search</label>
+    <input id="blog-search" class="search" type="search" placeholder="Search posts" autocomplete="off" data-search="{{ '/search.json' | relative_url }}">
+  </div>
+  {% if site.categories.size > 0 %}
+  <div>
+    <p class="eyebrow">Categories</p>
+    {% assign cats = site.categories | sort %}
+    {% for c in cats %}<p><a href="{{ '/blog/archive/' | relative_url }}#cat-{{ c[0] | slugify }}">{{ c[0] }}</a> <span class="n">({{ c[1].size }})</span></p>{% endfor %}
+  </div>
+  {% endif %}
+  {% if series.size > 0 %}
+  <div>
+    <p class="eyebrow">Series</p>
+    {% for s in series %}<p><a href="{{ '/blog/archive/' | relative_url }}#series-{{ s.name | slugify }}">{{ s.name }}</a> <span class="n">({{ s.size }})</span></p>{% endfor %}
+  </div>
+  {% endif %}
+  {% if by_month.size > 0 %}
+  <div>
+    <p class="eyebrow">Archive</p>
+    {% for m in by_month limit: 12 %}<p><a href="{{ '/blog/archive/' | relative_url }}#{{ m.name | slugify }}">{{ m.name }}</a> <span class="n">({{ m.size }})</span></p>{% endfor %}
+  </div>
+  {% endif %}
+  <div>
+    <p class="eyebrow">Follow</p>
+    <p><a href="{{ '/feed.xml' | relative_url }}">RSS feed</a></p>
+  </div>
+</aside>

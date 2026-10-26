@@ -1,0 +1,106 @@
+# In-browser editor (Sveltia CMS) — https://webb-c.github.io/admin/
+# Sign in with “Sign In with Token”: a GitHub fine-grained token for this
+# repository with Contents: Read and write. Every save is a commit to master.
+
+backend:
+  name: github
+  repo: webb-c/webb-c.github.io
+  branch: master
+  commit_messages:
+    create: "Add {{collection}} “{{slug}}”"
+    update: "Update {{collection}} “{{slug}}”"
+    delete: "Delete {{collection}} “{{slug}}”"
+    uploadMedia: "Upload “{{path}}”"
+    deleteMedia: "Delete “{{path}}”"
+
+site_url: https://webb-c.github.io
+display_url: https://webb-c.github.io
+
+# Images dropped into a post go here and are linked as /images/posts/<file>.
+media_folder: images/posts
+public_folder: /images/posts
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  # ---------------------------------------------------------------- blog
+  - name: posts
+    label: Blog posts
+    label_singular: Post
+    folder: _posts
+    create: true
+    # file name = date + the English address you type in "Address"
+    slug: "{{year}}-{{month}}-{{day}}-{{fields.slug}}"
+    summary: "{{title}}"
+    sortable_fields: [date, title]
+    preview_path: "blog/{{year}}/{{month}}/{{day}}/{{fields.slug}}/"
+    fields:
+      - { label: Title, name: title, widget: string }
+      - label: Address
+        name: slug
+        widget: string
+        hint: "The post's web address, in English letters and hyphens — e.g. surface-gkp-notes → /blog/2026/10/27/surface-gkp-notes/"
+        pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', "Lower-case English letters, numbers and hyphens only"]
+      - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD HH:mm:ss ZZ" }
+      - { label: "One line for Home (optional)", name: description, widget: string, required: false }
+      - { label: Language, name: lang, widget: select, options: [ko, en], default: ko }
+      - { label: Category, name: categories, widget: list, required: false, hint: "Usually one, e.g. research" }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: "Series (optional)", name: series, widget: string, required: false, hint: "Posts with the same series are linked together" }
+      - { label: "Math ($$ … $$)", name: math, widget: boolean, default: false, required: false }
+      - { label: "Published", name: published, widget: boolean, default: true, hint: "Turn off to keep it as a hidden draft" }
+      - { label: Body, name: body, widget: markdown }
+
+  # ---------------------------------------------------------------- papers
+  - name: publications
+    label: Publications
+    label_singular: Paper
+    folder: _publications
+    create: true
+    slug: "{{year}}-{{fields.short_title}}"
+    summary: "{{title}}"
+    sortable_fields: [date, title]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: "Short name (on the board)", name: short_title, widget: string }
+      - { label: Authors, name: authors, widget: list, hint: "One name per item, in order. Your name is bolded automatically." }
+      - { label: Venue, name: venue, widget: string, hint: "e.g. arXiv preprint, IEEE Transactions on Mobile Computing" }
+      - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      - { label: Type, name: type, widget: select, options: [preprint, journal, conference] }
+      - label: "Selected number"
+        name: selected
+        widget: number
+        value_type: int
+        min: 1
+        max: 9
+        required: false
+        hint: "1, 2, 3 … puts it in “Selected” and on the board as [1], [2] … Leave empty for the full list only."
+      - { label: "arXiv id", name: arxiv, widget: string, required: false, hint: "e.g. 2606.24469" }
+      - { label: "DOI", name: doi, widget: string, required: false, hint: "e.g. 10.1109/TMC.2025.1234567 — makes the “Published” link" }
+      - { label: "Published version link", name: published, widget: string, required: false, hint: "Only if there is no DOI" }
+      - { label: "Code link", name: code, widget: string, required: false }
+      - { label: "One-sentence summary", name: summary, widget: text, required: false }
+      - { label: BibTeX, name: bibtex, widget: text, required: false }
+
+  # ---------------------------------------------------------------- talks
+  - name: talks
+    label: Talks
+    label_singular: Talk
+    folder: _talks
+    create: true
+    slug: "{{year}}-{{fields.short_title}}"
+    summary: "{{event}}"
+    sortable_fields: [date]
+    fields:
+      - { label: "Talk title (optional)", name: title, widget: string, required: false }
+      - { label: Event, name: event, widget: string }
+      - { label: "Short name (on the board)", name: short_title, widget: string }
+      - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      - { label: "Date as shown (optional)", name: when, widget: string, required: false, hint: "e.g. Jul 14, 2026 — leave empty to show the date above" }
+      - { label: Location, name: location, widget: string, required: false }
+      - { label: "Slides link", name: slides, widget: string, required: false, hint: "e.g. /slides/<folder>/ or a full URL" }
+      - { label: "Video link", name: video, widget: string, required: false }
+      - { label: "Related paper link", name: paper, widget: string, required: false }
+      - { label: "Notes (optional)", name: body, widget: markdown, required: false }

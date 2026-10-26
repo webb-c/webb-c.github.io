@@ -1,41 +1,53 @@
+# webb-c.github.io
 
-# Academic Pages
+Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master`에 push하면 몇 분 뒤 https://webb-c.github.io 에 반영됩니다.
 
-![pages-build-deployment](https://github.com/academicpages/academicpages.github.io/actions/workflows/pages/pages-build-deployment/badge.svg)
+## 무엇을 고치려면 어디를 보면 되나
 
-Academic Pages is a Github Pages template for academic websites.
+| 고치고 싶은 것 | 파일 |
+| --- | --- |
+| 이름, 소속, 이메일, 짧은 소개(bio), 관심 분야, CV·Scholar·GitHub 링크 | `_data/profile.yml` |
+| About의 연구 경력 · 학력 | `_data/profile.yml` (`experience`, `education`) |
+| About 페이지의 문단 · 레이아웃 · **사진(현재 주석 처리)** | `_pages/about.html` |
+| Home 페이지 (첫 화면 문구, 섹션 순서) | `index.html` |
+| 논문 추가/수정 (Publications, Home의 Selected) | `_publications/*.md` — 파일 하나가 논문 하나. `selected: 1`, `selected: 2` …면 Selected 목록과 퍼즐 보드에 그 번호([1], [2])로 나옴. 논문별 페이지는 없음 |
+| Publications 페이지 구성 | `_pages/publications.html` |
+| 논문 한 줄(저자·제목·링크·BibTeX) 모양 | `_includes/paper-ref.html` |
+| 발표 추가/수정 | `_talks/*.md` — 파일 하나가 발표 하나 |
+| Talks 페이지 구성 / 발표 한 줄 모양 | `_pages/talks.html` / `_includes/talk.html` |
+| 블로그 글 쓰기 (브라우저에서) | https://webb-c.github.io/admin/ → “Sign In Using Access Token” (아래 참고) |
+| 블로그 글 쓰기 (파일로) | `_posts/YYYY-MM-DD-주소.md` (템플릿: `_drafts/new-post-template.md`) |
+| 브라우저 편집기(/admin)에서 고칠 수 있는 항목 | `admin/config.yml` |
+| 블로그 첫 화면 · 사이드바 · 전체 글 목록 | `blog/index.html` · `_includes/blog-sidebar.html` · `_pages/blog-archive.html` |
+| 블로그 글 하나의 레이아웃 (댓글 포함) | `_layouts/post.html` |
+| 상단 메뉴 / 하단 footer | `_includes/nav.html` / `_includes/footer.html` |
+| 퍼즐 내용 (단어 위치, 오브젝트, 게이트, 첫 방문 화면, 튜토리얼) | `_data/puzzles.yml` |
+| 각 페이지의 퍼즐 그림 캡션 | 해당 페이지 파일의 `{% include board.html ... caption="..." %}` |
+| 퍼즐 전체 끄기 | `_config.yml`의 `puzzles: false` |
+| 색상(라이트/다크), 글꼴, 간격 등 모든 스타일 | `assets/css/site.css` (맨 위 1번 섹션이 색상) |
+| 퍼즐 동작(게임 로직, Baba Is You 규칙) | `assets/js/puzzle.js` |
+| 다크 모드 버튼, 논문 필터, 블로그 검색 | `assets/js/site.js` |
+| 사이트 제목·설명, 블로그 페이지당 글 수, 댓글(giscus) | `_config.yml` |
+| CV PDF | `files/CV.pdf` (같은 이름으로 덮어쓰기) |
 
+## 브라우저에서 글쓰기 (/admin)
 
-# Getting Started
+1. GitHub → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token
+   - Repository access: **Only select repositories** → `webb-c.github.io`
+   - Permissions → Repository permissions → **Contents: Read and write**
+2. https://webb-c.github.io/admin/ 에서 **Sign In Using Access Token** → 토큰 붙여넣기 (이 브라우저에만 저장됨)
+3. Blog posts / Publications / Talks를 고르고 쓰기 → **Save**를 누르면 master에 커밋되고, 1–2분 뒤 사이트에 반영됩니다.
+   - 블로그 글의 Address는 영어 소문자와 하이픈(예: `surface-gkp-notes`) — 글 주소가 됩니다.
+   - Published를 끄면 사이트에 안 보이는 초안으로 저장됩니다.
 
-1. Register a GitHub account if you don't have one and confirm your e-mail (required!)
-1. Click the "Use this template" button in the top right.
-1. On the "New repository" page, enter your repository name as "[your GitHub username].github.io", which will also be your website's URL.
-1. Set site-wide configuration and add your content.
-1. Upload any files (like PDFs, .zip files, etc.) to the `files/` directory. They will appear at https://[your GitHub username].github.io/files/example.pdf.  
-1. Check status by going to the repository settings, in the "GitHub pages" section
-1. (Optional) Use the Jupyter notebooks or python scripts in the `markdown_generator` folder to generate markdown files for publications and talks from a TSV file.
+## 로컬에서 미리 보기
 
-See more info at https://academicpages.github.io/
+```bash
+bundle install
+bundle exec jekyll serve      # http://localhost:4000
+bundle exec jekyll serve --drafts   # _drafts 글도 같이 보기
+```
 
-## Running Locally
+## 예전 파일
 
-When you are initially working your website, it is very useful to be able to preview the changes locally before pushing them to GitHub. To work locally you will need to:
-
-1. Clone the repository and made updates as detailed above.
-1. Make sure you have ruby-dev, bundler, and nodejs installed: `sudo apt install ruby-dev ruby-bundler nodejs`
-1. Run `bundle install` to install ruby dependencies. If you get errors, delete Gemfile.lock and try again.
-1. Run `jekyll serve -l -H localhost` to generate the HTML and serve it from `localhost:4000` the local server will automatically rebuild and refresh the pages on change.
-
-
-# Maintenance 
-
-Bug reports and feature requests to the template  should be [submitted via GitHub](https://github.com/academicpages/academicpages.github.io/issues/new/choose). For questions concerning how to style the template, please feel free to start a [new discussion on GitHub](https://github.com/academicpages/academicpages.github.io/discussions).
-
-This repository was forked (then detached) by [Stuart Geiger](https://github.com/staeiou) from the [Minimal Mistakes Jekyll Theme](https://mmistakes.github.io/minimal-mistakes/), which is © 2016 Michael Rose and released under the MIT License (see LICENSE.md). It is currently being maintained by [Robert Zupko](https://github.com/rjzupkoii) and additional maintainers would be welcomed.
-
-## Bugfixes and enhancements
-
-If you have bugfixes and enhancements that you would like to submit as a pull request, you will need to [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) this repository as opposed to using it as a template. This will also allow you to [synchronize your copy](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) of template to your fork as well.
-
-Unfortunately, one logistical issue with a template theme like Academic Pages that makes it a little tricky to get bug fixes and updates to the core theme. If you use this template and customize it, you will probably get merge conflicts if you attempt to synchronize. If you want to save your various .yml configuration files and markdown files, you can delete the repository and fork it again. Or you can manually patch.
+이전 academicpages 테마의 파일은 `_old/`에 모아 두었습니다. Jekyll은 `_`로 시작하는 폴더를 빌드하지 않으므로 사이트에는 영향이 없고, 필요 없으면 폴더째 지워도 됩니다.

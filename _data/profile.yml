@@ -1,0 +1,49 @@
+# ---------------------------------------------------------------------------
+# Who you are — used by the header, Home, About and the footer.
+# ---------------------------------------------------------------------------
+
+name: "Vaughn Sohn"
+role: "Research assistant"
+affiliation: "QIT Lab, KAIST"
+location: "Daejeon, Korea"
+email: "webb41@kaist.ac.kr"
+motto: "Per aspera ad astra."
+
+# One sentence under your name on Home.
+tagline: "Research assistant at the QIT Lab, KAIST. I work on quantum algorithms and complexity theory."
+
+# Short bio: Home shows this; About shows it too, above the longer text.
+bio: >-
+  I am a research assistant at the QIT Lab in KAIST, after a B.S. in Computer Science
+  and Engineering at Konkuk University. My research focuses on theoretical computer
+  science: quantum computing algorithms and complexity theory.
+
+interests:
+  - "Quantum computing algorithms"
+  - "Complexity theory"
+recent_topics:
+  - "Surface-GKP codes"
+  - "Quantum state cloning"
+
+links:
+  cv: "/files/CV.pdf"
+  cv_updated: "August 2026"
+  scholar: "https://scholar.google.co.kr/citations?user=xNpT0cAAAAAJ"
+  github: "https://github.com/webb-c"
+
+# About › Research experience (newest first)
+experience:
+  - dates: "2025.02 – present"
+    title: "Research Assistant, KAIST"
+    detail: "QIT Lab, Dept. of Physics"
+  - dates: "2022.08 – 2024.05"
+    title: "Undergraduate Research Assistant, Konkuk University"
+    detail: >-
+      Connected Intelligence Lab (CoIn), Dept. of Computer Science and Engineering.
+      Algorithms for partitioning and offloading the computation of deep neural networks;
+      Lyapunov optimization, deep learning and reinforcement learning.
+
+# About › Education (newest first)
+education:
+  - dates: "2024"
+    title: "B.S. in Computer Science and Engineering, Konkuk University"

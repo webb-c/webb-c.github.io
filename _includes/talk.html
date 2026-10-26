@@ -1,0 +1,21 @@
+{%- assign t = include.talk -%}
+{%- assign has_title = false -%}{%- if t.title and t.title != "" -%}{%- assign has_title = true -%}{%- endif -%}
+{%- assign has_loc = false -%}{%- if t.location and t.location != "" -%}{%- assign has_loc = true -%}{%- endif -%}
+{%- assign body = t.content | strip -%}
+<article class="talk">
+  <p class="row__when">{% if t.when %}{{ t.when }}{% else %}{{ t.date | date: "%b %-d, %Y" }}{% endif %}</p>
+  <div>
+    <h3>{% if has_title %}{{ t.title }}{% else %}{{ t.event }}{% endif %}</h3>
+    {%- if has_title or has_loc %}
+    <p class="talk__where">{% if has_title %}<em>{{ t.event }}</em>{% if has_loc %} · {% endif %}{% endif %}{% if has_loc %}{{ t.location }}{% endif %}</p>
+    {%- endif %}
+    {%- if body != "" %}<div class="row__text">{{ body | markdownify }}</div>{% endif %}
+    {%- if t.slides or t.video or t.paper %}
+    <div class="btn-row">
+      {% if t.slides %}<a class="btn btn--primary" href="{{ t.slides | relative_url }}">Slides →</a>{% endif %}
+      {% if t.video %}<a class="btn" href="{{ t.video }}" target="_blank" rel="noopener">Video ↗</a>{% endif %}
+      {% if t.paper %}<a class="btn" href="{{ t.paper | relative_url }}">Related paper</a>{% endif %}
+    </div>
+    {%- endif %}
+  </div>
+</article>

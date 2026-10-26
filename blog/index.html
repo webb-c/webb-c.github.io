@@ -1,0 +1,41 @@
+---
+layout: base
+title: Blog
+nav: blog
+---
+{%- comment -%}
+  Blog front page — the newest posts, `paginate` (in _config.yml) per page.
+  Posts are Markdown files in _posts/ named YYYY-MM-DD-title.md.
+{%- endcomment -%}
+{%- assign profile = site.data.profile -%}
+{%- include blog-head.html current="latest" -%}
+
+<div class="blog">
+  <div class="blog__feed">
+    <div data-search-results hidden></div>
+    <div data-feed style="display: flex; flex-direction: column; gap: 56px">
+      {% for post in paginator.posts %}
+      {%- assign cat = post.categories | first -%}
+      {%- assign words = post.content | number_of_words -%}
+      <article class="card" aria-labelledby="post-{{ forloop.index }}">
+        <h2 id="post-{{ forloop.index }}"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+        <p class="meta">{{ post.date | date: "%Y.%m.%d" }} · {{ profile.name }} · {{ words | divided_by: 200 | plus: 1 }} min read{% if post.series %} · Series: {{ post.series }}{% endif %}</p>
+        <div class="card__excerpt">{{ post.excerpt }}</div>
+        <p class="more" style="margin-top: 6px"><a href="{{ post.url | relative_url }}">Continue reading →</a></p>
+        <p class="meta card__foot">{% if cat %}Filed under <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}{% if post.tags.size > 0 %} · Tags: {{ post.tags | join: ", " }}{% endif %}</p>
+      </article>
+      {% else %}
+      <p class="empty">No posts yet.</p>
+      {% endfor %}
+
+      {% if paginator.total_pages > 1 %}
+      <nav class="pager" aria-label="Pages">
+        {% if paginator.previous_page %}<a href="{{ paginator.previous_page_path | relative_url }}">← Newer posts</a>{% else %}<span>← Newer posts</span>{% endif %}
+        <span>Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+        {% if paginator.next_page %}<a href="{{ paginator.next_page_path | relative_url }}">Older posts →</a>{% else %}<span>Older posts →</span>{% endif %}
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+  {% include blog-sidebar.html %}
+</div>

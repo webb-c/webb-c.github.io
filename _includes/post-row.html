@@ -1,0 +1,1 @@
+{%- assign p = include.post -%}<li><span class="meta">{{ p.date | date: "%Y.%m.%d" }}</span><a href="{{ p.url | relative_url }}">{{ p.title }}</a><span class="cat">{{ p.categories | first }}</span></li>

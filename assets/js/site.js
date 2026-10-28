@@ -19,6 +19,61 @@
   });
   label();
 
+  // --- block names (the "Captions" button in the top menu, or ?blocks in the
+  //     address): show the name of every part of the page — H-a, A-c, Q-b … —
+  //     to use when asking for a change. The choice is remembered per browser.
+  var layer = document.createElement('div');
+  layer.className = 'block-labels';
+  layer.setAttribute('aria-hidden', 'true');
+  var blocksOn = false;
+  try { blocksOn = localStorage.getItem('webb.blocks') === '1'; } catch (e) {}
+  if (/[?&]blocks\b/.test(location.search)) blocksOn = true;
+  var draw = function () {
+    if (!blocksOn) { if (layer.parentNode) layer.parentNode.removeChild(layer); return; }
+    if (!layer.parentNode) document.body.appendChild(layer);
+    layer.innerHTML = '';
+    var placed = [];
+    Array.prototype.forEach.call(document.querySelectorAll('[data-block]'), function (el) {
+      var r = el.getBoundingClientRect();
+      if (!r.width && !r.height) return;
+      var tag = document.createElement('span');
+      tag.className = 'block-label';
+      tag.textContent = el.getAttribute('data-block');
+      var x = Math.max(10, r.left + window.scrollX), y = Math.max(10, r.top + window.scrollY);
+      // labels that would sit on top of each other move along to the right
+      while (placed.some(function (p) { return Math.abs(p[0] - x) < 44 && Math.abs(p[1] - y) < 18; })) x += 46;
+      placed.push([x, y]);
+      tag.style.left = x + 'px';
+      tag.style.top = y + 'px';
+      layer.appendChild(tag);
+    });
+  };
+  var later = function () { if (blocksOn) setTimeout(draw, 60); };
+  var setBlocks = function (on) {
+    blocksOn = on;
+    root.classList.toggle('show-blocks', on);
+    Array.prototype.forEach.call(document.querySelectorAll('[data-blocks-toggle]'), function (b) {
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var t = b.querySelector('[data-blocks-label]');
+      if (t) t.textContent = on ? 'Captions OFF' : 'Captions ON';
+    });
+    draw();
+  };
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-blocks-toggle]')) {
+      var on = !blocksOn;
+      try { if (on) localStorage.setItem('webb.blocks', '1'); else localStorage.removeItem('webb.blocks'); } catch (err) {}
+      setBlocks(on);
+      return;
+    }
+    later();
+  });
+  window.addEventListener('load', later);
+  window.addEventListener('resize', later);
+  document.addEventListener('keyup', later);
+  setBlocks(blocksOn);
+  later();
+
   // --- publications: filter chips ---------------------------------------------
   var filters = document.querySelector('[data-pub-filters]');
   if (filters) {

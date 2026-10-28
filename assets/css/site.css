@@ -373,3 +373,9 @@ code, pre, kbd { font-family: var(--mono); }
 .board__card .rule-line { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4cqw 0.8cqw; font-size: 1.8cqw; }
 .board__card-btns { margin-top: 0.6cqw; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .board__card-btns .btn { min-height: 36px; font-size: 13px; }
+
+/* Block names (the Captions button in the top menu, or any page with ?blocks) */
+.theme-toggle[aria-pressed="true"] { border-color: #C2410C; color: #C2410C; }
+.show-blocks [data-block] { outline: 1.5px dashed #E8590C; outline-offset: 3px; }
+.block-labels { position: absolute; left: 0; top: 0; z-index: 9999; pointer-events: none; }
+.block-label { position: absolute; transform: translate(-8px, -55%); padding: 3px 6px; border-radius: 4px; background: #E8590C; color: #FFFFFF; font: 600 12px/1 var(--mono); white-space: nowrap; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }

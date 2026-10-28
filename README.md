@@ -4,6 +4,8 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 
 ## 무엇을 고치려면 어디를 보면 되나
 
+각 페이지의 부분마다 이름(H-a, A-c, Q-b …)이 붙어 있습니다. 상단 메뉴의 **Captions ON** 버튼을 누르면(또는 주소 뒤에 `?blocks`) 화면에 이름표가 보이고, 코드에서는 `data-block="H-a"`로 찾을 수 있습니다. 켠 상태는 그 브라우저에 기억됩니다.
+
 | 고치고 싶은 것 | 파일 |
 | --- | --- |
 | 이름, 소속, 이메일, 짧은 소개(bio), 관심 분야, CV·Scholar·GitHub 링크 | `_data/profile.yml` |

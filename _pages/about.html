@@ -22,9 +22,9 @@ redirect_from:
   <img class="photo" src="{{ '/images/profile.png' | relative_url }}" alt="{{ profile.name }}">
   {%- endcomment -%}
   <div>
-    <h1>About me</h1>
-    <p class="lede">{{ profile.name }} · {{ profile.role }}, {{ profile.affiliation }} · {{ profile.location }}</p>
-    <div class="btn-row">
+    <h1 data-block="A-a">About me</h1>
+    <p class="lede" data-block="A-b">{{ profile.name }} · {{ profile.role }}, {{ profile.affiliation }} · {{ profile.location }}</p>
+    <div class="btn-row" data-block="A-c">
       <a class="btn btn--primary" href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">CV (PDF) ↗</a>
       <a class="btn" href="mailto:{{ profile.email }}">Email</a>
       <a class="btn" href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Scholar ↗</a>
@@ -34,18 +34,18 @@ redirect_from:
 </div>
 
 <div class="section--tight" style="margin-top: 44px">
-  {% include board.html level="about" fig="Figure 0." caption="About, as a board. Push [win] up the column — bio, CV or contact opens. The gates along the bottom lead to the other pages." %}
+  {% include board.html level="about" block="A-d" cap_block="A-e" fig="Figure 0." caption="About, as a board. Push [win] up the column — bio, CV or contact opens. The gates along the bottom lead to the other pages." %}
 </div>
 
 <section id="bio" class="section split" aria-labelledby="h-bio">
-  <div class="split__main">
+  <div class="split__main" data-block="A-f">
     <h2 id="h-bio" class="section-title"><span class="num">1</span>Bio</h2>
     <div class="prose">
       <p>{{ profile.bio }}</p>
       <!-- Add more paragraphs here: how you got here, what you are working on now. -->
     </div>
   </div>
-  <aside class="split__aside">
+  <aside class="split__aside" data-block="A-g">
     <p class="eyebrow">Interests</p>
     <p>{{ profile.interests | join: " · " }}</p>
     <p class="eyebrow">Recent topics</p>
@@ -53,7 +53,7 @@ redirect_from:
   </aside>
 </section>
 
-<section class="section" aria-labelledby="h-exp" style="max-width: 760px">
+<section class="section" aria-labelledby="h-exp" style="max-width: 760px" data-block="A-h">
   <h2 id="h-exp" class="section-title"><span class="num">2</span>Research experience</h2>
   <ul class="rows" style="list-style: none; padding: 0">
     {% for e in profile.experience %}
@@ -62,7 +62,7 @@ redirect_from:
   </ul>
 </section>
 
-<section class="section" aria-labelledby="h-edu" style="max-width: 760px; margin-top: 56px">
+<section class="section" aria-labelledby="h-edu" style="max-width: 760px; margin-top: 56px" data-block="A-i">
   <h2 id="h-edu" class="section-title"><span class="num">3</span>Education</h2>
   <ul class="rows" style="list-style: none; padding: 0">
     {% for e in profile.education %}
@@ -71,7 +71,7 @@ redirect_from:
   </ul>
 </section>
 
-<section id="contact" class="section measure" aria-labelledby="h-contact" style="margin-top: 56px">
+<section id="contact" class="section measure" aria-labelledby="h-contact" style="margin-top: 56px" data-block="A-j">
   <h2 id="h-contact" class="section-title"><span class="num">4</span>Contact</h2>
   <dl class="kv">
     <dt>Email</dt><dd><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></dd>

@@ -8,10 +8,10 @@ board: true
 {%- assign talks = site.talks | sort: "date" | reverse -%}
 
 <div class="hero">
-  <h1>{{ profile.name }}</h1>
-  <p class="deck">{{ profile.tagline }}</p>
-  {% if site.puzzles %}<p class="lede">This site is also a small puzzle — but everything on it can be read without playing.</p>{% endif %}
-  <div class="byline">
+  <h1 data-block="H-a">{{ profile.name }}</h1>
+  <p class="deck" data-block="H-b">{{ profile.tagline }}</p>
+  {% if site.puzzles %}<p class="lede" data-block="H-c">This site is also a small puzzle — but everything on it can be read without playing.</p>{% endif %}
+  <div class="byline" data-block="H-d">
     <div><p class="eyebrow">Affiliation</p><p>{{ profile.affiliation }}</p></div>
     <div><p class="eyebrow">Contact</p><p><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></p></div>
     <div><p class="eyebrow">Elsewhere</p><p><a href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">CV</a> · <a href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Scholar</a> · <a href="{{ profile.links.github }}" target="_blank" rel="noopener">GitHub</a></p></div>
@@ -20,17 +20,17 @@ board: true
 
 {% if site.puzzles %}
 <section class="section--tight" aria-labelledby="h-how" style="margin-top: 44px">
-  {% include board.html level="home" intro="auto" fig="Figure 0." caption="The front door of this site. On a first visit it asks how you would like to start — straight to the map, a one-minute tutorial, or no game at all. After that it is the map: walk with W A S D, and the gates along the bottom (H, A, P, T, B) lead to each page. Stand on one and press Enter." %}
+  {% include board.html level="home" intro="auto" block="H-e" cap_block="H-f" fig="Figure 0." caption="The front door of this site. On a first visit it asks how you would like to start — straight to the map, a one-minute tutorial, or no game at all. After that it is the map: walk with W A S D, and the gates along the bottom (H, A, P, T, B) lead to each page. Stand on one and press Enter." %}
 
   <div class="split" style="margin-top: 40px">
-    <div class="split__main">
+    <div class="split__main" data-block="H-g">
       <h2 id="h-how" class="section-title" style="font-size: 28px">How this site works</h2>
       <div class="prose">
         <p>Every rule here is a sentence built from blocks: a subject, the verb <span class="rule"><span class="rw rw--v">is</span></span>, and a property. Push the blocks and the sentence changes — and with it, what is true.</p>
         <p>The same board sits at the top of About, Publications and Talks, each with its own puzzle and the same five gates, so you can walk from page to page without leaving the board. The blog is plain reading.</p>
       </div>
     </div>
-    <aside class="split__aside">
+    <aside class="split__aside" data-block="H-h">
       <p><span class="rule"><span class="rw rw--s">subject</span><span class="rw rw--v">is</span><span class="rw rw--o">property</span></span></p>
       <p>Gates never need solving — only the content on each board does.</p>
       <p>Rather just read? “Hide puzzles” under any board hides them on every page; the menu at the top goes to the same places.</p>
@@ -39,13 +39,13 @@ board: true
 </section>
 {% endif %}
 
-<section class="section measure" aria-labelledby="h-about">
+<section class="section measure" aria-labelledby="h-about" data-block="H-i">
   <h2 id="h-about" class="section-title"><span class="num">1</span>About</h2>
   <p class="prose" style="margin: 14px 0 0">{{ profile.bio }}</p>
   <p class="more"><a href="{{ '/about/' | relative_url }}">More about me →</a></p>
 </section>
 
-<section class="section" aria-labelledby="h-pubs" style="max-width: 760px">
+<section class="section" aria-labelledby="h-pubs" style="max-width: 760px" data-block="H-j">
   <h2 id="h-pubs" class="section-title"><span class="num">2</span>Selected publications</h2>
   <ol class="pubs" style="margin-top: 18px">
     {%- for n in (1..9) -%}{%- for p in site.publications -%}{%- if p.selected == n %}
@@ -55,7 +55,7 @@ board: true
   <p class="more"><a href="{{ '/publications/' | relative_url }}">All publications →</a></p>
 </section>
 
-<section class="section measure" aria-labelledby="h-talks">
+<section class="section measure" aria-labelledby="h-talks" data-block="H-k">
   <h2 id="h-talks" class="section-title"><span class="num">3</span>Talks</h2>
   <ul class="rows">
     {% for t in talks limit: 3 %}
@@ -66,7 +66,7 @@ board: true
   <p class="more"><a href="{{ '/talks/' | relative_url }}">All talks →</a></p>
 </section>
 
-<section class="section measure" aria-labelledby="h-blog">
+<section class="section measure" aria-labelledby="h-blog" data-block="H-l">
   <h2 id="h-blog" class="section-title"><span class="num">4</span>From the blog</h2>
   <ul class="rows">
     {% for post in site.posts limit: 3 %}

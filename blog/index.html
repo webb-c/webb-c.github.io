@@ -17,7 +17,7 @@ nav: blog
       {% for post in paginator.posts %}
       {%- assign cat = post.categories | first -%}
       {%- assign words = post.content | number_of_words -%}
-      <article class="card" aria-labelledby="post-{{ forloop.index }}">
+      <article class="card" data-block="B-d" aria-labelledby="post-{{ forloop.index }}">
         <h2 id="post-{{ forloop.index }}"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
         <p class="meta">{{ post.date | date: "%Y.%m.%d" }} · {{ profile.name }} · {{ words | divided_by: 200 | plus: 1 }} min read{% if post.series %} · Series: {{ post.series }}{% endif %}</p>
         <div class="card__excerpt">{{ post.excerpt }}</div>
@@ -29,7 +29,7 @@ nav: blog
       {% endfor %}
 
       {% if paginator.total_pages > 1 %}
-      <nav class="pager" aria-label="Pages">
+      <nav class="pager" aria-label="Pages" data-block="B-e">
         {% if paginator.previous_page %}<a href="{{ paginator.previous_page_path | relative_url }}">← Newer posts</a>{% else %}<span>← Newer posts</span>{% endif %}
         <span>Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
         {% if paginator.next_page %}<a href="{{ paginator.next_page_path | relative_url }}">Older posts →</a>{% else %}<span>Older posts →</span>{% endif %}

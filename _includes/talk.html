@@ -2,7 +2,7 @@
 {%- assign has_title = false -%}{%- if t.title and t.title != "" -%}{%- assign has_title = true -%}{%- endif -%}
 {%- assign has_loc = false -%}{%- if t.location and t.location != "" -%}{%- assign has_loc = true -%}{%- endif -%}
 {%- assign body = t.content | strip -%}
-<article class="talk">
+<article class="talk" data-block="T-g">
   <p class="row__when">{% if t.when %}{{ t.when }}{% else %}{{ t.date | date: "%b %-d, %Y" }}{% endif %}</p>
   <div>
     <h3>{% if has_title %}{{ t.title }}{% else %}{{ t.event }}{% endif %}</h3>

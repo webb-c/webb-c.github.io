@@ -7,10 +7,10 @@
 {%- if site.puzzles -%}
 {%- assign P = site.data.puzzles -%}
 {%- assign talks_sorted = site.talks | sort: "date" | reverse -%}
-<figure class="board" data-board data-level="{{ include.level }}" data-intro="{{ include.intro | default: 'off' }}">
+<figure class="board"{% if include.block %} data-block="{{ include.block }}"{% endif %} data-board data-level="{{ include.level }}" data-intro="{{ include.intro | default: 'off' }}">
   <div class="board__mount"></div>
   {%- if include.caption %}
-  <figcaption class="board__caption" data-caption><strong>{{ include.fig }}</strong> {{ include.caption }}</figcaption>
+  <figcaption class="board__caption"{% if include.cap_block %} data-block="{{ include.cap_block }}"{% endif %} data-caption><strong>{{ include.fig }}</strong> {{ include.caption }}</figcaption>
   {%- endif %}
   <script type="application/json" class="board__data">
   {

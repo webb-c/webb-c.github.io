@@ -1,5 +1,5 @@
 {%- assign profile = site.data.profile -%}
-<header class="site-header">
+<header class="site-header" data-block="N">
   <div class="site-header__inner">
     <a class="site-header__brand" href="{{ '/' | relative_url }}">{{ profile.name }}</a>
     <nav class="site-nav" aria-label="Site">
@@ -10,6 +10,7 @@
       {%- endfor -%}
       <a class="site-nav__quiet" href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">CV ↗</a>
       <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch colour theme"><span data-theme-label>Dark mode</span></button>
+      <button type="button" class="theme-toggle" data-blocks-toggle aria-pressed="false" title="Show the name of each part of the page"><span data-blocks-label>Captions ON</span></button>
     </nav>
   </div>
 </header>

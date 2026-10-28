@@ -1,10 +1,10 @@
-<div class="page-head">
+<div class="page-head" data-block="{% if include.current == "archive" %}BA-a{% else %}B-a{% endif %}">
   {% if include.current == "archive" %}<p class="crumbs"><a href="{{ '/blog/' | relative_url }}">Blog</a> / all posts</p>{% endif %}
   <h1>{% if include.current == "archive" %}All posts{% else %}Blog{% endif %}</h1>
   <p class="lede">{% if include.current == "archive" %}Every post on one page — by date, by category, by tag and by series.{% else %}Notes on research and other things.{% endif %}</p>
-  {% if site.puzzles and include.current != "archive" %}<p class="meta" style="margin-top: 10px; font-size: 14px">No puzzles in here — the blog is plain reading. <a href="{{ '/' | relative_url }}" style="color: var(--link)">← Back to the map</a></p>{% endif %}
+  {% if site.puzzles and include.current != "archive" %}<p class="meta" style="margin-top: 10px; font-size: 14px" data-block="B-b">No puzzles in here — the blog is plain reading. <a href="{{ '/' | relative_url }}" style="color: var(--link)">← Back to the map</a></p>{% endif %}
 </div>
-<nav class="blog-nav" aria-label="Blog">
+<nav class="blog-nav" aria-label="Blog" data-block="{% if include.current == "archive" %}BA-b{% else %}B-c{% endif %}">
   <a href="{{ '/blog/' | relative_url }}"{% if include.current == "latest" %} aria-current="page"{% endif %}>Latest</a>
   <a href="{{ '/blog/archive/' | relative_url }}"{% if include.current == "archive" %} aria-current="page"{% endif %}>All posts</a>
   <a href="{{ '/blog/archive/' | relative_url }}#series">Series</a>

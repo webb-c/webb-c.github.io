@@ -164,16 +164,16 @@
   Board.prototype.build = function () {
     var fig = this.fig, mount = fig.querySelector('.board__mount'), self = this;
     mount.innerHTML =
-      '<div class="board__tut" hidden></div>' +
-      '<div class="board__scroll"><section class="board__grid" tabindex="0">' +
+      '<div class="board__tut" data-block="Q-a" hidden></div>' +
+      '<div class="board__scroll"><section class="board__grid" data-block="Q-b" tabindex="0">' +
         '<div class="board__wire" aria-hidden="true"></div><div class="board__psi" aria-hidden="true">|ψ〉</div>' +
         '<div class="board__gates" aria-hidden="true"></div><div class="board__layer" aria-hidden="true"></div>' +
-        '<div class="board__intro" hidden></div><div class="board__over" hidden></div>' +
+        '<div class="board__intro" data-block="Q-c" hidden></div><div class="board__over" data-block="Q-d" hidden></div>' +
         '<div class="board__chip" aria-hidden="true">Click to play</div>' +
       '</section></div>' +
-      '<div class="board__bar"><div class="board__say"><p class="board__status" aria-live="polite"></p>' +
+      '<div class="board__bar"><div class="board__say" data-block="Q-e"><p class="board__status" aria-live="polite"></p>' +
         '<a class="btn btn--primary board__act" hidden><kbd>Enter</kbd><span></span></a></div>' +
-        '<div class="board__pad">' +
+        '<div class="board__pad" data-block="Q-f">' +
           '<button type="button" class="key" data-k="w" aria-label="Move up">W</button>' +
           '<button type="button" class="key" data-k="a" aria-label="Move left">A</button>' +
           '<button type="button" class="key" data-k="s" aria-label="Move down">S</button>' +
@@ -181,9 +181,9 @@
           '<button type="button" class="key" data-k="z" aria-label="Undo">Z undo</button>' +
           '<button type="button" class="key" data-k="r" aria-label="Restart">R reset</button>' +
         '</div></div>' +
-      '<p class="board__links"><button type="button" class="linkbtn board__replay" hidden>Show the welcome screen again</button>' +
+      '<p class="board__links" data-block="Q-g"><button type="button" class="linkbtn board__replay" hidden>Show the welcome screen again</button>' +
         '<button type="button" class="linkbtn linkbtn--quiet board__hide">Hide puzzles</button></p>' +
-      '<div class="board__off" hidden><span>Puzzles are hidden on every page. The menu at the top goes to the same places.</span>' +
+      '<div class="board__off" data-block="Q-h" hidden><span>Puzzles are hidden on every page. The menu at the top goes to the same places.</span>' +
         '<button type="button" class="btn btn--pill board__show">Show puzzles</button></div>';
 
     var q = function (s) { return mount.querySelector(s); };

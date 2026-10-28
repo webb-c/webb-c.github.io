@@ -8,7 +8,7 @@ nav: blog
 {%- assign series = site.posts | where_exp: "p", "p.series" | group_by: "series" -%}
 {%- include blog-head.html current="archive" -%}
 
-<nav class="tabs-jump" aria-label="Jump to">
+<nav class="tabs-jump" aria-label="Jump to" data-block="BA-c">
   <a href="#by-date">By date</a>
   <a href="#by-category">By category</a>
   <a href="#by-tag">By tag</a>
@@ -16,7 +16,7 @@ nav: blog
 </nav>
 
 <div style="max-width: 760px">
-  <section id="by-date" class="group">
+  <section id="by-date" class="group" data-block="BA-d">
     <h2>By date <span class="n">({{ site.posts.size }})</span></h2>
     {% for m in by_month %}
     <h3 id="{{ m.name | slugify }}">{{ m.name }}</h3>
@@ -26,7 +26,7 @@ nav: blog
     {% endfor %}
   </section>
 
-  <section id="by-category" class="group">
+  <section id="by-category" class="group" data-block="BA-e">
     <h2>By category</h2>
     {% assign cats = site.categories | sort %}
     {% for c in cats %}
@@ -35,7 +35,7 @@ nav: blog
     {% endfor %}
   </section>
 
-  <section id="by-tag" class="group">
+  <section id="by-tag" class="group" data-block="BA-f">
     <h2>By tag</h2>
     {% assign tags = site.tags | sort %}
     {% for t in tags %}
@@ -44,7 +44,7 @@ nav: blog
     {% endfor %}
   </section>
 
-  <section id="series" class="group">
+  <section id="series" class="group" data-block="BA-g">
     <h2>Series</h2>
     {% for s in series %}
     {% assign parts = s.items | sort: "date" %}

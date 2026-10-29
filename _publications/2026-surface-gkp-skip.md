@@ -7,7 +7,7 @@ authors: ["Vaughn Sohn", "Changhun Oh"]
 venue: "arXiv preprint"
 date: 2026-08-31
 type: preprint                         # preprint | journal | conference
-selected: 1                            # 1, 2, 3 … = its number on the board ([1]) and in “Selected”; remove to unselect
+selected: 1                            # 1, 2, 3 … = its level on the map (01) and its number in “Selected”; remove to unselect
 arxiv: "2606.24469"                    # arXiv id → arXiv and PDF links
 # doi: ""                              # published version, e.g. 10.1109/TMC.2025.1234567
 # published: ""                        # …or a full link to the published version

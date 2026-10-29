@@ -4,18 +4,20 @@
 #
 # The rules are Baba Is You's. A rule is NOUN IS PROPERTY (or NOUN IS NOUN),
 # read left → right or top → bottom; AND joins words ("star and wall is push").
-#   Nouns (blue):        WEBB STAR WALL PAPER BIO CV MAIL SLIDE
+#   Nouns (blue):        WEBB STAR WALL PAPER BIO CV MAIL SLIDE KEY DOOR
 #   Verb (orange):       IS   (and AND)
-#   Properties (green):  YOU  WIN  STOP  PUSH  DEFEAT  SINK
-#   Publications only:   1 2 3 … (which selected paper) and ARXIV / PUB (where it opens)
+#   Properties (green):  YOU  WIN  STOP  PUSH  DEFEAT  SINK  HOT  MELT  OPEN  SHUT
 # Text is always pushable. You win the moment something that is YOU stands on
 # something that is WIN — itself included ("webb is win" while webb is you).
 # NOUN IS NOUN turns one kind of object into another (star is wall).
+# HOT destroys MELT on its tile; OPEN and SHUT destroy each other when they meet,
+# so an OPEN key pushed into a SHUT, STOP door opens it.
 #
 # Words: [WORD, x, y].
-# Objects: kind is one of star, wall, paper, bio, cv, mail, slide. When an
-# object you win on has a `url`, the win card offers to open it (Enter);
+# Objects: kind is one of star, wall, paper, bio, cv, mail, slide, key, door.
+# When an object you win on has a `url`, the win card offers to open it (Enter);
 # `message` is shown instead when there is no link.
+# walls: [x1, y1, x2, y2] — a straight run of wall objects (paper levels).
 # ---------------------------------------------------------------------------
 
 # Present on every board, top-left.
@@ -94,18 +96,78 @@ levels:
       - { kind: cv, x: 12, y: 3, caption: "CV", label: "CV", url: "/files/CV.pdf", external: true, action: "Open the CV (PDF) ↗" }
       - { kind: mail, x: 12, y: 5, caption: "Contact", label: "Contact", url: "#contact", action: "Go to contact ↓" }
 
-  # One paper on the board. The words [1] [2] … are the selected papers listed
-  # under the board (_publications/*.md with `selected: 1`, `selected: 2`, …).
-  # [paper is 1] picks the paper, [paper is arxiv] or [paper is pub] picks
-  # where it opens; then walk onto the paper.
+  # A map, as in the game: webb is SELECT and moves only along opened paths
+  # and open levels. Each level is a selected paper (_publications/*.md with
+  # `selected: 1`, `selected: 2` …); stand on one and press Enter to play its
+  # puzzle below. Clearing a level offers the paper and reveals every path
+  # marked `after:` that level, which opens the levels those paths reach.
+  # A selected paper with no node here is still in the list, just not on the map.
   publications:
     here: publications
     spawn: 9
-    hint: "Make [paper is 1] (or 2) to pick a paper from the list below, and [paper is arxiv] or [paper is pub] to pick where it opens. Then walk onto the paper."
-    words: [[PAPER, 5, 2], [IS, 6, 2], [IS, 5, 3], [ARXIV, 3, 6], [PUB, 6, 6]]
-    auto: papers
-    number_slots: [[8, 5], [10, 4], [12, 6]]   # where [1] [2] [3] start
-    object: [12, 2]
+    hint: "Walk the paths with W A S D. Stand on a numbered level and press Enter to play it; clearing it opens the paper and the paths beyond."
+    map:
+      rule: [[WEBB, 1, 1], [IS, 2, 1], [SELECT, 3, 1]]    # drawn only — the map has no rules to push
+      nodes:                                              # n = the paper's `selected:` number
+        - { n: 1, x: 9, y: 5 }
+        - { n: 2, x: 6, y: 3 }
+        - { n: 3, x: 12, y: 3 }
+      paths:                                              # from → via … → to, straight runs; gate P is at (9, 8)
+        - { from: [9, 8], to: [9, 5] }
+        - { from: [9, 5], via: [[6, 5]], to: [6, 3], after: 1 }
+        - { from: [9, 5], via: [[12, 5]], to: [12, 3], after: 1 }
+      decor:
+        - [tree, 1, 4]
+        - [tree, 2, 6]
+        - [tree, 1, 7]
+        - [tree, 4, 4]
+        - [tree, 6, 7]
+        - [tree, 12, 7]
+        - [tree, 15, 1]
+        - [tree, 16, 3]
+        - [tree, 14, 6]
+        - [tree, 16, 6]
+
+      # The puzzle behind each level, by paper number. `webb` is where you start;
+      # the whole 18 × 9 board is yours (no gates inside a level).
+      puzzles:
+        1:   # When to Skip Syndrome Extraction in Surface-GKP Codes
+          name: "Skip a Round"
+          webb: [4, 5]
+          words: [[WEBB, 1, 1], [IS, 2, 1], [YOU, 3, 1],
+                  [WALL, 1, 7], [IS, 2, 7], [STOP, 3, 7],
+                  [PAPER, 6, 4], [IS, 7, 4],
+                  [WIN, 13, 4]]
+          walls: [[12, 2, 16, 2], [12, 6, 16, 6], [12, 3, 12, 5], [16, 3, 16, 5]]
+          objects:
+            - { kind: paper, x: 15, y: 4 }
+        2:   # Optimal copy complexity of quantum state cloning
+          name: "Copies"
+          webb: [4, 7]
+          words: [[WEBB, 1, 1], [IS, 2, 1], [YOU, 3, 1],
+                  [PAPER, 7, 4], [IS, 8, 4], [WIN, 9, 4],
+                  [IS, 4, 5], [STAR, 2, 6],
+                  [WALL, 1, 8], [IS, 2, 8], [STOP, 3, 8]]
+          walls: [[10, 2, 14, 2], [10, 6, 14, 6], [10, 3, 10, 5], [14, 3, 14, 5], [8, 3, 9, 3], [8, 5, 9, 5]]
+          objects:
+            - { kind: paper, x: 12, y: 4 }
+            - { kind: star, x: 16, y: 1 }
+            - { kind: star, x: 16, y: 7 }
+            - { kind: star, x: 6, y: 8 }
+        3:   # Need for Coherent Access in Constructing Quantum Cryptography
+          name: "Need for Access"
+          webb: [4, 4]
+          words: [[WEBB, 1, 1], [IS, 2, 1], [YOU, 3, 1],
+                  [KEY, 7, 0], [IS, 8, 0], [PUSH, 9, 0],
+                  [AND, 10, 3], [OPEN, 11, 6],
+                  [WALL, 1, 8], [IS, 2, 8], [STOP, 3, 8],
+                  [DOOR, 5, 8], [IS, 6, 8], [SHUT, 7, 8], [AND, 8, 8], [STOP, 9, 8],
+                  [PAPER, 11, 8], [IS, 12, 8], [WIN, 13, 8]]
+          walls: [[13, 2, 17, 2], [13, 6, 17, 6], [13, 3, 13, 3], [13, 5, 13, 5]]
+          objects:
+            - { kind: door, x: 13, y: 4 }
+            - { kind: key, x: 8, y: 4 }
+            - { kind: paper, x: 16, y: 4 }
 
   # Objects come from _talks/*.md files that have `slides:` (newest three).
   talks:

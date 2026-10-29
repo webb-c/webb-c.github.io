@@ -143,7 +143,6 @@ code, pre, kbd { font-family: var(--mono); }
 .rw--s { background: var(--s-fill); border-color: var(--s-line); }
 .rw--v { background: var(--v-fill); border-color: var(--v-line); font-style: italic; }
 .rw--o { background: var(--o-fill); border-color: var(--o-line); font-weight: 600; }
-.rw--d { background: var(--o-fill); border-color: var(--o-line); font-family: var(--mono); font-size: 0.8em; }
 
 .photo { width: 168px; height: 168px; flex: none; border-radius: 12px; object-fit: cover; }
 .about-head { padding-top: 64px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px 36px; }
@@ -296,10 +295,9 @@ code, pre, kbd { font-family: var(--mono); }
 .tile--word { z-index: 4; }
 .tile--v > span { font-style: italic; }
 .tile--o > span { font-weight: 600; }
-.tile--d > span { font-family: var(--mono); font-weight: 500; font-size: 1.5cqw; }
 .tile--s.is-on > span { background: var(--s-fill); border-color: var(--s-line); color: var(--ink); }
 .tile--v.is-on > span { background: var(--v-fill); border-color: var(--v-line); color: var(--ink); }
-.tile--o.is-on > span, .tile--d.is-on > span { background: var(--o-fill); border-color: var(--o-line); color: var(--ink); }
+.tile--o.is-on > span { background: var(--o-fill); border-color: var(--o-line); color: var(--ink); }
 .tile__sprite { position: absolute; inset: 14%; color: var(--ink); }
 .tile--webb { z-index: 6; }
 .tile--webb .tile__sprite { animation: webb-bob 1.4s steps(1, end) infinite; }
@@ -313,6 +311,34 @@ code, pre, kbd { font-family: var(--mono); }
 .tile__tag { position: absolute; left: -80%; right: -80%; bottom: 94%; text-align: center; font: 600 1.3cqw var(--serif); color: var(--win-ink); white-space: nowrap; }
 .tile__tag.is-link { font-family: var(--mono); }
 .tile__cap { position: absolute; left: 112%; top: 32%; font: 1.45cqw/1.2 var(--sans); color: var(--sub); white-space: nowrap; }
+
+.tile--key .tile__sprite, .tile--door .tile__sprite { color: var(--ink); }
+
+/* Publications map: dashed paths, level icons 01 02 …, webb as the SELECT cursor */
+.board__map { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.map__path { position: absolute; border: 0 dashed var(--wire); }
+.map__path--h { height: 0; border-top-width: 1.5px; transform: translateY(-0.75px); }
+.map__path--v { width: 0; border-left-width: 1.5px; transform: translateX(-0.75px); }
+.map__path.is-new { animation: path-in 1.2s ease-out both; }
+@keyframes path-in { from { opacity: 0; } to { opacity: 1; } }
+.map__decor { position: absolute; width: 5.5556%; height: 11.1111%; padding: 1.2cqw; color: var(--wire); }
+.map__decor svg .fill { fill: var(--board); }
+.map__count { position: absolute; left: 1.2%; top: 2.4%; font: 1.2cqw var(--sans); color: var(--sub); }
+.node { position: absolute; width: 5.5556%; height: 11.1111%; z-index: 2; }
+.node__box { position: absolute; inset: 12%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ink); border-radius: 3px; background: var(--board); color: var(--ink); font: 500 1.55cqw var(--mono); line-height: 1; }
+.node.is-locked .node__box { border-style: dashed; border-color: var(--wire); color: var(--wire); }
+.node.is-done .node__box { background: var(--o-fill); border-color: var(--o-line); }
+.node.is-done .node__box::after { content: ""; position: absolute; right: -0.45cqw; top: -0.45cqw; width: 0.9cqw; height: 0.9cqw; border-radius: 50%; background: var(--o-line); }
+.node__label { position: absolute; left: 50%; bottom: 96%; transform: translateX(-50%); padding: 0.15cqw 0.6cqw; border-radius: 999px; font: 600 1.12cqw var(--sans); color: var(--ink); white-space: nowrap; }
+.node.is-standing .node__label { background: var(--ring); }
+.map__cursor { z-index: 6; }
+.map__cursor .tile__sprite { inset: 24%; }
+.map__select { position: absolute; inset: 4%; border: 1.5px dashed var(--ink); border-radius: 4px; animation: select 1.4s steps(1, end) infinite; }
+@keyframes select { 0% { inset: 4%; } 50% { inset: 0; } }
+.board__pad.is-map [data-k="z"], .board__pad.is-map [data-k="r"] { display: none; }
+.board__level-name { color: var(--ink); font-weight: 600; }
+.board__level-paper { color: var(--sub); }
+.board__back { min-height: 36px; font-weight: 500; font-size: 13px; }
 
 .board__chip { position: absolute; right: 1.2%; top: 2.4%; z-index: 20; padding: 4px 10px; border-radius: 999px; background: var(--chip-bg); color: var(--sub); font: 12px var(--sans); pointer-events: none; }
 

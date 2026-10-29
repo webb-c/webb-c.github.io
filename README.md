@@ -12,7 +12,8 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | About의 연구 경력 · 학력 | `_data/profile.yml` (`experience`, `education`) |
 | About 페이지의 문단 · 레이아웃 · **사진(현재 주석 처리)** | `_pages/about.html` |
 | Home 페이지 (첫 화면 문구, 섹션 순서) | `index.html` |
-| 논문 추가/수정 (Publications, Home의 Selected) | `_publications/*.md` — 파일 하나가 논문 하나. `selected: 1`, `selected: 2` …면 Selected 목록과 퍼즐 보드에 그 번호([1], [2])로 나옴. 논문별 페이지는 없음 |
+| 논문 추가/수정 (Publications, Home의 Selected) | `_publications/*.md` — 파일 하나가 논문 하나. `selected: 1`, `selected: 2` …면 Selected 목록에 [1], [2]로, Publications 맵에 레벨 01, 02로 나옴. 논문별 페이지는 없음 |
+| Publications 맵 (레벨 위치, 길, 레벨마다의 퍼즐) | `_data/puzzles.yml`의 `levels › publications › map` — `nodes`(레벨 위치), `paths`(`after: n`이면 레벨 n을 깬 뒤 열림), `puzzles`(논문 번호별 퍼즐) |
 | Publications 페이지 구성 | `_pages/publications.html` |
 | 논문 한 줄(저자·제목·링크·BibTeX) 모양 | `_includes/paper-ref.html` |
 | 발표 추가/수정 | `_talks/*.md` — 파일 하나가 발표 하나 |

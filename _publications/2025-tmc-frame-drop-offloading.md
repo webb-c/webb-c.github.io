@@ -5,7 +5,7 @@ authors: ["Vaughn Sohn", "Suhwan Kim", "Hyang-Won Lee"]
 venue: "IEEE Transactions on Mobile Computing"
 date: 2025-02-04
 type: journal
-# selected: 3       # uncomment to put it on the board as [3]
+# selected: 4       # uncomment to list it in “Selected” as [4] (add a node in _data/puzzles.yml to put it on the map)
 # doi: ""           # add the DOI (e.g. 10.1109/TMC.2025.xxxxxxx) to get a “Published” link
 summary: "A layering framework for joint video frame drop and object detection task offloading; in the lower layer, Lyapunov optimization drives the partitioning and offloading of deep neural network computation."
 bibtex: |

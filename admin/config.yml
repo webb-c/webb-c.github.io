@@ -76,7 +76,7 @@ collections:
         min: 1
         max: 9
         required: false
-        hint: "1, 2, 3 … puts it in “Selected” and on the board as [1], [2] … Leave empty for the full list only."
+        hint: "1, 2, 3 … puts it in “Selected” as [1], [2] … and on the Publications map as level 01, 02 … (if the map has a level with that number). Leave empty for the full list only."
       - { label: "arXiv id", name: arxiv, widget: string, required: false, hint: "e.g. 2606.24469" }
       - { label: "DOI", name: doi, widget: string, required: false, hint: "e.g. 10.1109/TMC.2025.1234567 — makes the “Published” link" }
       - { label: "Published version link", name: published, widget: string, required: false, hint: "Only if there is no DOI" }

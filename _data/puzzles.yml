@@ -96,16 +96,16 @@ levels:
       - { kind: cv, x: 12, y: 3, caption: "CV", label: "CV", url: "/files/CV.pdf", external: true, action: "Open the CV (PDF) ↗" }
       - { kind: mail, x: 12, y: 5, caption: "Contact", label: "Contact", url: "#contact", action: "Go to contact ↓" }
 
-  # A map, as in the game: webb is SELECT and moves only along opened paths
-  # and open levels. Each level is a selected paper (_publications/*.md with
-  # `selected: 1`, `selected: 2` …); stand on one and press Enter to play its
-  # puzzle below. Clearing a level offers the paper and reveals every path
-  # marked `after:` that level, which opens the levels those paths reach.
+  # A map, as in the game: webb is SELECT and moves only along the paths.
+  # Each level is a selected paper (_publications/*.md with `selected: 1`,
+  # `selected: 2` …); stand on one and press Enter to play its puzzle below.
+  # Every level is open from the start, in any order; clearing one offers the
+  # paper. (A path with `after: n` would stay hidden until level n is cleared.)
   # A selected paper with no node here is still in the list, just not on the map.
   publications:
     here: publications
     spawn: 9
-    hint: "Walk the paths with W A S D. Stand on a numbered level and press Enter to play it; clearing it opens the paper and the paths beyond."
+    hint: "Walk the paths with W A S D. Stand on any numbered level and press Enter to play it; clearing it opens the paper."
     map:
       rule: [[WEBB, 1, 1], [IS, 2, 1], [SELECT, 3, 1]]    # drawn only — the map has no rules to push
       nodes:                                              # n = the paper's `selected:` number
@@ -114,8 +114,8 @@ levels:
         - { n: 3, x: 12, y: 3 }
       paths:                                              # from → via … → to, straight runs; gate P is at (9, 8)
         - { from: [9, 8], to: [9, 5] }
-        - { from: [9, 5], via: [[6, 5]], to: [6, 3], after: 1 }
-        - { from: [9, 5], via: [[12, 5]], to: [12, 3], after: 1 }
+        - { from: [9, 5], via: [[6, 5]], to: [6, 3] }
+        - { from: [9, 5], via: [[12, 5]], to: [12, 3] }
       decor:
         - [tree, 1, 4]
         - [tree, 2, 6]

@@ -32,6 +32,8 @@
 
   var COLS = 18, ROWS = 9;
   var KEY_INTRO = 'webb.introDone', KEY_OFF = 'webb.puzzlesOff', KEY_CLEARED = 'webb.cleared';
+  // set just before a gate changes page: where the board sat on screen and whether it was full screen
+  var KEY_HOP = 'webb.hop';
   var NOUNS = { WEBB: 'webb', STAR: 'star', WALL: 'wall', PAPER: 'paper', BIO: 'bio', CV: 'cv', MAIL: 'mail', SLIDE: 'slide', KEY: 'key', DOOR: 'door' };
   // a paper on the map with no puzzle of its own in puzzles.yml gets this one
   var PLAIN_LEVEL = { name: 'Read me', webb: [3, 4], words: [['WEBB', 1, 1], ['IS', 2, 1], ['YOU', 3, 1], ['PAPER', 6, 4], ['IS', 7, 4], ['WIN', 8, 4]], objects: [{ kind: 'paper', x: 13, y: 4 }] };
@@ -149,7 +151,50 @@
     else this.load();
     boards.push(this);
     this.render();
+    this.arrive();
   }
+
+  // --- full screen and gate hops --------------------------------------------------
+  // F fills the window with the board (and asks the browser for real full screen).
+  // Changing page drops the browser's full screen, so the next board keeps only the
+  // window-filling part; F or Esc leaves it.
+  Board.prototype.isFull = function () { return this.fig.classList.contains('is-full'); };
+  Board.prototype.setFull = function (on, native) {
+    var fig = this.fig, fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    fig.classList.toggle('is-full', on);
+    document.documentElement.classList.toggle('has-full-board', on);
+    try {
+      if (on && native && !fsEl) {
+        var req = fig.requestFullscreen || fig.webkitRequestFullscreen;
+        var r = req && req.call(fig);
+        if (r && r.catch) r.catch(function () {});
+      } else if (!on && fsEl === fig) {
+        var r2 = (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+        if (r2 && r2.catch) r2.catch(function () {});
+      }
+    } catch (e) {}
+    this.render();
+    this.focus();
+  };
+  // Leaving through a gate: remember where the board was in the window.
+  Board.prototype.leave = function () {
+    try { window.sessionStorage.setItem(KEY_HOP, JSON.stringify({ top: this.fig.getBoundingClientRect().top, full: this.isFull(), t: Date.now() })); } catch (e) {}
+  };
+  // Arriving through a gate: put the board back at the same place in the window.
+  Board.prototype.arrive = function () {
+    var hop = null, self = this;
+    try { hop = JSON.parse(window.sessionStorage.getItem(KEY_HOP) || 'null'); window.sessionStorage.removeItem(KEY_HOP); } catch (e) {}
+    if (!hop || Date.now() - hop.t > 15000 || puzzlesOff()) return;
+    if (hop.full) { this.setFull(true, false); return; }
+    if (location.hash) return;
+    var place = function () { window.scrollTo(0, window.scrollY + self.fig.getBoundingClientRect().top - hop.top); };
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    place();
+    this.focus();
+    // fonts and images can still move things once they load
+    window.addEventListener('load', place, { once: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+  };
 
   // Turn the YAML level (plus the selected papers' map / talks) into words + objects.
   Board.prototype.buildLevel = function () {
@@ -226,6 +271,7 @@
           '<button type="button" class="key" data-k="d" aria-label="Move right">D</button>' +
           '<button type="button" class="key" data-k="z" aria-label="Undo">Z undo</button>' +
           '<button type="button" class="key" data-k="r" aria-label="Restart">R reset</button>' +
+          '<button type="button" class="key" data-k="f" aria-label="Full screen">F full</button>' +
         '</div></div>' +
       '<p class="board__links" data-block="Q-g"><button type="button" class="linkbtn board__replay" hidden>Show the welcome screen again</button>' +
         '<button type="button" class="linkbtn linkbtn--quiet board__hide">Hide puzzles</button></p>' +
@@ -264,7 +310,15 @@
     el.act.addEventListener('click', function (e) {
       var n = el.act.getAttribute('data-level');
       if (n) { e.preventDefault(); self.enter(+n); self.focus(); }
+      else self.leave();
     });
+    var fsChange = function () {
+      // the browser's own Esc ends real full screen; take the window-filling mode with it
+      if (!(document.fullscreenElement || document.webkitFullscreenElement) && self.fsWas === self.fig && self.isFull()) self.setFull(false);
+      self.fsWas = document.fullscreenElement || document.webkitFullscreenElement;
+    };
+    document.addEventListener('fullscreenchange', fsChange);
+    document.addEventListener('webkitfullscreenchange', fsChange);
     el.over.addEventListener('click', function (e) {
       var b = e.target.closest('[data-card]');
       if (!b) return;
@@ -513,8 +567,10 @@
     if (k === 'escape') {
       if (g.stage === 'level') { this.toMap(); return true; }
       if (g.card && !g.card.lesson) { g.card = null; this.render(); return true; }
+      if (this.isFull()) { this.setFull(false); return true; }
       return false;
     }
+    if (k === 'f') { this.setFull(!this.isFull(), true); return true; }
     if (dirs[k]) { this.step(dirs[k][0], dirs[k][1]); return true; }
     if (k === 'enter' || k === ' ') { this.act(); return true; }
     if (g.stage === 'intro' || g.stage === 'map') return false;
@@ -542,11 +598,11 @@
 
     var intro = g.stage === 'intro', tut = g.stage === 'tut', play = g.stage === 'play', map = g.stage === 'map', level = g.stage === 'level';
     el.grid.classList.toggle('is-intro', intro);
-    el.grid.setAttribute('aria-label', intro
+    el.grid.setAttribute('aria-label', (intro
       ? 'Welcome. ' + ((this.D.welcome || {}).question || '') + ' Choose with W and S or the arrow keys, confirm with Enter.'
       : map ? 'Map of selected papers. Move along the paths with W A S D or the arrow keys. Stand on a numbered level and press Enter to play its puzzle, or on a gate along the bottom to change page.'
       : level ? 'Puzzle for paper ' + g.level + '. Move with W A S D or the arrow keys. Z undoes, R restarts, Escape goes back to the map.'
-      : 'Puzzle board. Move with W A S D or the arrow keys. Z undoes, R restarts. Stand on a gate along the bottom and press Enter to change page.');
+      : 'Puzzle board. Move with W A S D or the arrow keys. Z undoes, R restarts. Stand on a gate along the bottom and press Enter to change page.') + ' F toggles full screen.');
     el.wire.hidden = el.psi.hidden = el.gates.hidden = !(play || map);
     el.layer.hidden = intro || map;
     el.map.hidden = !map;

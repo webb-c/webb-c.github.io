@@ -385,6 +385,13 @@ code, pre, kbd { font-family: var(--mono); }
 .board__caption { max-width: 760px; margin: 12px 4px 0; font: 14px/1.65 var(--sans); color: var(--sub); }
 .board__caption strong { color: var(--ink); font-weight: 600; }
 
+/* Full screen (F): the board fills the window, as large as fits. 150px leaves room for the bar below it. */
+html.has-full-board { overflow: hidden; }
+.board.is-full { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; justify-content: center; padding: 16px; background: var(--bg); overflow: auto; }
+.board.is-full .board__mount { width: min(100%, calc((100vh - 150px) * 2)); margin: 0 auto; }
+.board.is-full .board__grid { min-width: 0; }
+.board.is-full .board__caption { display: none; }
+
 /* Publications (no per-paper pages) and the win card */
 .pub__cite { margin: 0; }
 .pub__title a { color: var(--ink); text-decoration: none; }

@@ -10,19 +10,19 @@ email: "webb41@kaist.ac.kr"
 motto: "Per aspera ad astra."
 
 # One sentence under your name on Home.
-tagline: "Research assistant at the QIT Lab, KAIST. I work on quantum algorithms and complexity theory."
+tagline: ""
 
 # Short bio: Home shows this; About shows it too, above the longer text.
 bio: >-
-  I am a research assistant at the QIT Lab in KAIST, after a B.S. in Computer Science
-  and Engineering at Konkuk University. My research focuses on theoretical computer
-  science: quantum computing algorithms and complexity theory.
+  I am a research assistant at the QIT Lab in KAIST. My research focuses on theoretical computer
+  science, especially quantum information and (quantum) cryptography.
 
 interests:
-  - "Quantum computing algorithms"
-  - "Complexity theory"
+  - "Quantum cryptography"
+  - "Quantum computing and information"
+  - "Theoretical computer science"
 recent_topics:
-  - "Surface-GKP codes"
+  - "Quantum cryptography"
   - "Quantum state cloning"
 
 links:
@@ -38,12 +38,11 @@ experience:
     detail: "QIT Lab, Dept. of Physics"
   - dates: "2022.08 – 2024.05"
     title: "Undergraduate Research Assistant, Konkuk University"
-    detail: >-
-      Connected Intelligence Lab (CoIn), Dept. of Computer Science and Engineering.
-      Algorithms for partitioning and offloading the computation of deep neural networks;
-      Lyapunov optimization, deep learning and reinforcement learning.
-
+    detail: "Connected Intelligence Lab (CoIn), Dept. of Computer Science and Engineering."
+      
 # About › Education (newest first)
 education:
-  - dates: "2024"
+  - dates: "2024.09 - present"
+    title: "Ph.D. in Electrical Engineering, KAIST"
+  - dates: "2021.03 - 2024.08"
     title: "B.S. in Computer Science and Engineering, Konkuk University"

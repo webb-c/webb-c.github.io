@@ -69,19 +69,17 @@ collections:
       - { label: Venue, name: venue, widget: string, hint: "e.g. arXiv preprint, IEEE Transactions on Mobile Computing" }
       - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
       - { label: Type, name: type, widget: select, options: [preprint, journal, conference] }
-      - label: "Selected number"
+      - label: "Selected"
         name: selected
-        widget: number
-        value_type: int
-        min: 1
-        max: 9
+        widget: boolean
+        default: false
         required: false
-        hint: "1, 2, 3 … puts it in “Selected” as [1], [2] … and on the Publications map as level 01, 02 … (if the map has a level with that number). Leave empty for the full list only."
+        hint: "On: listed under “Selected papers” and on the Publications map. Selected papers are numbered by date, newest first, so a new paper becomes [1]."
       - { label: "arXiv id", name: arxiv, widget: string, required: false, hint: "e.g. 2606.24469" }
       - { label: "DOI", name: doi, widget: string, required: false, hint: "e.g. 10.1109/TMC.2025.1234567 — makes the “Published” link" }
       - { label: "Published version link", name: published, widget: string, required: false, hint: "Only if there is no DOI" }
       - { label: "Code link", name: code, widget: string, required: false }
-      - { label: "One-sentence summary", name: summary, widget: text, required: false }
+      - { label: "One-sentence summary (not shown on the site)", name: summary, widget: text, required: false }
       - { label: BibTeX, name: bibtex, widget: text, required: false }
 
   # ---------------------------------------------------------------- talks
@@ -97,7 +95,7 @@ collections:
       - { label: "Talk title (optional)", name: title, widget: string, required: false }
       - { label: Event, name: event, widget: string }
       - { label: "Short name (on the board)", name: short_title, widget: string }
-      - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      - { label: Date, name: date, widget: datetime, format: "YYYY-MM-DD", time_format: false, hint: "Talks are numbered by this date, newest first — [1] is the newest, and its stage on the Talks map" }
       - { label: "Date as shown (optional)", name: when, widget: string, required: false, hint: "e.g. Jul 14, 2026 — leave empty to show the date above" }
       - { label: Location, name: location, widget: string, required: false }
       - { label: "Slides link", name: slides, widget: string, required: false, hint: "e.g. /slides/<folder>/ or a full URL" }

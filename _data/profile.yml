@@ -4,7 +4,7 @@
 
 name: "Vaughn Sohn"
 role: "Research assistant"
-affiliation: "QIT Lab, KAIST"
+affiliation: "QIT Physics Lab, KAIST"
 location: "Daejeon, Korea"
 email: "webb41@kaist.ac.kr"
 motto: "Per aspera ad astra."
@@ -14,13 +14,10 @@ tagline: ""
 
 # Short bio: Home shows this; About shows it too, above the longer text.
 bio: >-
-  I am a research assistant at the QIT Lab in KAIST. My research focuses on theoretical computer
+  I am a research assistant at the QIT Physics Lab in KAIST. My research focuses on theoretical computer
   science, especially quantum information and (quantum) cryptography.
 
-interests:
-  - "Quantum cryptography"
-  - "Quantum computing and information"
-  - "Theoretical computer science"
+# About › Recent topics (beside the bio)
 recent_topics:
   - "Quantum cryptography"
   - "Quantum state cloning"
@@ -35,10 +32,10 @@ links:
 experience:
   - dates: "2025.02 – present"
     title: "Research Assistant, KAIST"
-    detail: "QIT Lab, Dept. of Physics"
+    detail: "QIT Physics Lab, Dept. of Physics"
   - dates: "2022.08 – 2024.05"
     title: "Undergraduate Research Assistant, Konkuk University"
-    detail: "Connected Intelligence Lab (CoIn), Dept. of Computer Science and Engineering."
+    detail: "Connected Intelligence Lab (CoIn), Dept. of Computer Science and Engineering"
       
 # About › Education (newest first)
 education:

@@ -5,9 +5,9 @@ title: "When to Skip Syndrome Extraction in Surface-GKP Codes"
 short_title: "Surface-GKP codes"      # short name used on the board
 authors: ["Vaughn Sohn", "Changhun Oh"]
 venue: "arXiv preprint"
-date: 2026-08-31
+date: 2026-06-23
 type: preprint                         # preprint | journal | conference
-selected: 1                            # 1, 2, 3 … = its level on the map (01) and its number in “Selected”; remove to unselect
+selected: true                         # listed under “Selected papers” and on the map; [1], [2] … follow the date, newest first
 arxiv: "2606.24469"                    # arXiv id → arXiv and PDF links
 # doi: ""                              # published version, e.g. 10.1109/TMC.2025.1234567
 # published: ""                        # …or a full link to the published version

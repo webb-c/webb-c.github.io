@@ -19,6 +19,8 @@
   --v-fill: #FFE9CC;  --v-line: #E0A04A;   /* verb     */
   --o-fill: #DAF1E0;  --o-line: #5FA877;   /* property */
   --win-ink: #3C7A50;
+  --read-ink: #9A5B12;
+  --sea: #F1F6FA;  --sea-dot: #CEDBE6;  --sea-line: #93AFC6;   /* the Talks map */
   --board: #FBFBF9;
   --board-line: #E0E0DC;
   --dot: #D6D6D0;
@@ -40,6 +42,8 @@
   --v-fill: #4A3720;  --v-line: #E8AD62;
   --o-fill: #1F3D2A;  --o-line: #7CC596;
   --win-ink: #7CC596;
+  --read-ink: #E8AD62;
+  --sea: #182029;  --sea-dot: #2C3946;  --sea-line: #557089;
   --board: #1B1E23;
   --board-line: #30343B;
   --dot: #343840;
@@ -104,9 +108,7 @@ code, pre, kbd { font-family: var(--mono); }
 .crumbs a { color: var(--sub); }
 
 .hero { max-width: 680px; padding-top: 64px; }
-.hero h1 { margin: 0; font-size: 58px; font-weight: 700; line-height: 1.05; letter-spacing: -0.015em; }
-.hero .deck { margin: 18px 0 0; font-size: 22px; line-height: 1.45; }
-.hero .lede { margin: 10px 0 0; font-size: 18px; line-height: 1.5; color: var(--sub); }
+.hero h1 { margin: 0; font-size: 50px; font-weight: 700; line-height: 1.05; letter-spacing: -0.015em; }
 .byline { margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px 20px; font-family: var(--sans); }
 .byline p { margin: 4px 0 0; font-size: 15px; }
 
@@ -128,6 +130,11 @@ code, pre, kbd { font-family: var(--mono); }
 .split__main { flex: 999 1 560px; min-width: 0; max-width: 680px; }
 .split__aside { flex: 1 1 220px; min-width: 0; max-width: 300px; padding-top: 52px; font: 13.5px/1.6 var(--sans); color: var(--sub); }
 .split__aside p { margin: 0 0 14px; }
+/* "More about me →" etc.: a side note next to its section, all in one column; below it once the page is too narrow */
+.split--more > .split__main { max-width: 760px; }
+.split--more .prose { max-width: 680px; }
+.split__aside--more { flex: 1 1 160px; padding-top: 12px; }
+.split__aside--more .more { margin: 0; }
 
 .btn-row { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
 .btn { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 6px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: 600 14px var(--sans); text-decoration: none; cursor: pointer; }
@@ -148,7 +155,6 @@ code, pre, kbd { font-family: var(--mono); }
 .about-head { padding-top: 64px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px 36px; }
 .about-head > div { flex: 1 1 420px; min-width: 0; max-width: 680px; }
 .about-head h1 { margin: 0; font-size: 52px; font-weight: 700; line-height: 1.05; letter-spacing: -0.01em; }
-.about-head .lede { margin: 14px 0 0; font-size: 21px; line-height: 1.45; color: var(--sub); }
 
 /* 4. Lists -------------------------------------------------------------------- */
 .rows { margin: 18px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 20px; }
@@ -181,6 +187,7 @@ code, pre, kbd { font-family: var(--mono); }
 
 .talk { display: grid; grid-template-columns: minmax(0, 120px) minmax(0, 1fr); gap: 6px 20px; margin-bottom: 26px; }
 .talk h3 { margin: 0; font-size: 22px; font-weight: 600; line-height: 1.35; }
+.talk__n { margin-right: 10px; color: var(--sub); font-weight: 400; }
 .talk__where { margin: 4px 0 0; font-size: 18px; line-height: 1.5; }
 .talk .btn-row { margin-top: 10px; }
 .empty { margin: 16px 0 0; padding: 16px 18px; border: 1px dashed var(--line); border-radius: 8px; font: 14px var(--sans); color: var(--sub); }
@@ -252,7 +259,7 @@ code, pre, kbd { font-family: var(--mono); }
   body { font-size: 17px; }
   .wrap { padding: 0 16px 32px; }
   .site-header__inner { padding: 6px 16px; }
-  .hero h1 { font-size: 44px; }
+  .hero h1 { font-size: 40px; }
   .page-head h1, .about-head h1 { font-size: 40px; }
   .post-head h1 { font-size: 36px; }
   .prose, .post-body { font-size: 18px; }
@@ -260,29 +267,43 @@ code, pre, kbd { font-family: var(--mono); }
   .row__when { line-height: 1.4; }
   .post-list li { grid-template-columns: 1fr; gap: 2px; }
   .post-list .cat { display: none; }
-  .split__aside { padding-top: 0; }
+  .split__aside, .split__aside--more { padding-top: 0; }
 }
 
 /* 6. Puzzle board --------------------------------------------------------------
    The board is a 18 × 9 grid; sizes inside it use cqw (1% of its width), so it
-   scales with the page. On narrow screens it keeps 640px and scrolls sideways. */
-.board { display: none; margin: 0; }
+   scales with the page. On narrow screens it keeps 640px and scrolls sideways.
+   The grid (.board__field) sits inside a margin of 0.4 of a cell on every side,
+   so the gate row and its circuit do not touch the frame: 18.8 × 9.8 cells in all. */
+.board { display: none; max-width: 920px; margin: 0; }
 .js .board { display: block; }
 .board__scroll { width: 100%; overflow-x: auto; padding: 4px; }
 .board__grid {
-  position: relative; width: 100%; min-width: 640px; aspect-ratio: 18 / 9; container-type: inline-size;
+  position: relative; width: 100%; min-width: 640px; aspect-ratio: 18.8 / 9.8; container-type: inline-size;
   border: 1px solid var(--board-line); border-radius: 8px; background-color: var(--board);
-  background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.6px); background-size: calc(100% / 18) calc(100% / 9);
   outline: none; overflow: hidden; cursor: pointer; font-family: var(--serif); color: var(--ink);
 }
+.board__field {
+  position: absolute; left: 2.1277%; right: 2.1277%; top: 4.0816%; bottom: 4.0816%;
+  background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.6px); background-size: calc(100% / 18) calc(100% / 9);
+}
 .board__grid:focus { box-shadow: 0 0 0 3px var(--ring); }
-.board__grid.is-intro { background-image: none; cursor: default; }
+.board__grid.is-intro { cursor: default; }
+.board__grid.is-intro .board__field { background-image: none; }
 .board__grid svg { display: block; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 0.9; stroke-linecap: round; stroke-linejoin: round; }
 .board__grid svg .fill { fill: var(--bg); }
 .board__grid svg .dot { fill: currentColor; stroke: none; }
+/* the Talks map is out at sea */
+.board__grid.is-sea { --board: var(--sea); --dot: var(--sea-dot); --wire: var(--sea-line); }
 
-.board__wire { position: absolute; left: 8.3333%; top: 94.4444%; width: 83.3333%; border-top: 1.5px solid var(--wire); pointer-events: none; }
-.board__psi { position: absolute; left: 4%; top: 91.6%; transform: translateY(-50%); font-style: italic; font-size: 1.7cqw; color: var(--sub); pointer-events: none; }
+/* the circuit along the gate row: |ψ⟩ ── gates ── measurement (positions in cells of 18 × 9) */
+.board__wire { position: absolute; left: 9.4444%; top: 94.4444%; width: 80.5556%; border-top: 1.5px solid var(--wire); pointer-events: none; }
+.board__psi { position: absolute; left: 9.1%; top: 94.4444%; width: 3.9cqw; aspect-ratio: 29 / 22; transform: translate(-100%, -50%); color: var(--sub); pointer-events: none; }
+.board__psi svg { stroke-width: 1.3; }
+.board__psi text { fill: currentColor; stroke: none; font: italic 15px var(--serif); }
+.board__meter { position: absolute; left: 90%; top: 94.4444%; width: 4.4444%; aspect-ratio: 24 / 18; transform: translateY(-50%); color: var(--sub); pointer-events: none; }
+.board__meter svg { stroke-width: 1.2; }
+.board__meter svg .fill { fill: var(--board); }
 .gate { position: absolute; width: 5.5556%; height: 11.1111%; z-index: 2; pointer-events: none; }
 .gate__box { position: absolute; inset: 12%; border: 1px solid var(--ink); border-radius: 3px; background: var(--board); display: flex; align-items: center; justify-content: center; font-style: italic; font-size: 1.95cqw; line-height: 1; }
 .gate.is-here .gate__box { background: var(--ink); color: var(--bg); }
@@ -306,15 +327,18 @@ code, pre, kbd { font-family: var(--mono); }
 .tile--wall.is-solid .tile__sprite { color: var(--ink); opacity: 1; }
 .tile--wall svg .fill { fill: var(--board); }
 .tile__ring { position: absolute; inset: 6%; border: 1.5px dashed var(--o-line); border-radius: 50%; display: none; animation: ring 1.4s steps(1, end) infinite; }
-.tile.is-win .tile__ring { display: block; }
+.tile.is-win .tile__ring, .tile.is-read .tile__ring { display: block; }
+.tile.is-read .tile__ring { border-color: var(--v-line); }
 @keyframes ring { 0% { inset: 6%; } 50% { inset: 2%; } }
-.tile__tag { position: absolute; left: -80%; right: -80%; bottom: 94%; text-align: center; font: 600 1.3cqw var(--serif); color: var(--win-ink); white-space: nowrap; }
-.tile__tag.is-link { font-family: var(--mono); }
-.tile__cap { position: absolute; left: 112%; top: 32%; font: 1.45cqw/1.2 var(--sans); color: var(--sub); white-space: nowrap; }
+/* "win" / "read" under an object; its name above it, like the gate labels */
+.tile__tag { position: absolute; left: -80%; right: -80%; top: 94%; text-align: center; font: 600 1.3cqw var(--serif); color: var(--win-ink); white-space: nowrap; }
+.tile.is-read .tile__tag { color: var(--read-ink); font-style: italic; }
+.tile__cap { position: absolute; left: 50%; bottom: 96%; transform: translateX(-50%); padding: 0.15cqw 0.6cqw; font: 1.12cqw var(--sans); color: var(--sub); white-space: nowrap; }
+.tile__cap:empty { display: none; }
 
 .tile--key .tile__sprite, .tile--door .tile__sprite { color: var(--ink); }
 
-/* Publications map: dashed paths, level icons 01 02 …, webb as the SELECT cursor */
+/* Publications / Talks maps: dashed paths, stage icons 01 02 …, webb as the SELECT cursor */
 .board__map { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .map__path { position: absolute; border: 0 dashed var(--wire); }
 .map__path--h { height: 0; border-top-width: 1.5px; transform: translateY(-0.75px); }
@@ -329,8 +353,6 @@ code, pre, kbd { font-family: var(--mono); }
 .node.is-locked .node__box { border-style: dashed; border-color: var(--wire); color: var(--wire); }
 .node.is-done .node__box { background: var(--o-fill); border-color: var(--o-line); }
 .node.is-done .node__box::after { content: ""; position: absolute; right: -0.45cqw; top: -0.45cqw; width: 0.9cqw; height: 0.9cqw; border-radius: 50%; background: var(--o-line); }
-.node__label { position: absolute; left: 50%; bottom: 96%; transform: translateX(-50%); padding: 0.15cqw 0.6cqw; border-radius: 999px; font: 600 1.12cqw var(--sans); color: var(--ink); white-space: nowrap; }
-.node.is-standing .node__label { background: var(--ring); }
 .map__cursor { z-index: 6; }
 .map__cursor .tile__sprite { inset: 24%; }
 .map__select { position: absolute; inset: 4%; border: 1.5px dashed var(--ink); border-radius: 4px; animation: select 1.4s steps(1, end) infinite; }
@@ -387,8 +409,8 @@ code, pre, kbd { font-family: var(--mono); }
 
 /* Full screen (F): the board fills the window, as large as fits. 150px leaves room for the bar below it. */
 html.has-full-board { overflow: hidden; }
-.board.is-full { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; justify-content: center; padding: 16px; background: var(--bg); overflow: auto; }
-.board.is-full .board__mount { width: min(100%, calc((100vh - 150px) * 2)); margin: 0 auto; }
+.board.is-full { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; justify-content: center; max-width: none; padding: 16px; background: var(--bg); overflow: auto; }
+.board.is-full .board__mount { width: min(100%, calc((100vh - 150px) * 18.8 / 9.8)); margin: 0 auto; }
 .board.is-full .board__grid { min-width: 0; }
 .board.is-full .board__caption { display: none; }
 
@@ -396,7 +418,6 @@ html.has-full-board { overflow: hidden; }
 .pub__cite { margin: 0; }
 .pub__title a { color: var(--ink); text-decoration: none; }
 .pub__title a:hover { text-decoration: underline; }
-.pub__summary { margin: 6px 0 0; font-size: 16px; line-height: 1.5; color: var(--sub); }
 .pub__bib { font: 13px var(--sans); }
 .pub__bib[open] { flex-basis: 100%; }
 .pub__bib summary { display: inline-block; min-height: 28px; line-height: 28px; color: var(--link); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }

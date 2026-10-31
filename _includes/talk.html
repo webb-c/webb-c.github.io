@@ -5,9 +5,9 @@
 <article class="talk" data-block="T-g">
   <p class="row__when">{% if t.when %}{{ t.when }}{% else %}{{ t.date | date: "%b %-d, %Y" }}{% endif %}</p>
   <div>
-    <h3>{% if has_title %}{{ t.title }}{% else %}{{ t.event }}{% endif %}</h3>
+    <h3>{% if include.n %}<span class="talk__n">[{{ include.n }}]</span>{% endif %}{% if has_title %}{{ t.title }}{% else %}{{ t.event }}{% endif %}</h3>
     {%- if has_title or has_loc %}
-    <p class="talk__where">{% if has_title %}<em>{{ t.event }}</em>{% if has_loc %} · {% endif %}{% endif %}{% if has_loc %}{{ t.location }}{% endif %}</p>
+    <p class="talk__where">{% if has_title %}{{ t.event }}{% if has_loc %}, {% endif %}{% endif %}{% if has_loc %}{{ t.location }}{% endif %}</p>
     {%- endif %}
     {%- if body != "" %}<div class="row__text">{{ body | markdownify }}</div>{% endif %}
     {%- if t.slides or t.video or t.paper %}

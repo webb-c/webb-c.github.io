@@ -3,12 +3,16 @@
  * Publications and Talks.
  *
  * Rules follow Baba Is You:
- *  - A rule is NOUN IS PROPERTY or NOUN IS NOUN, read left → right or
- *    top → bottom. AND joins nouns or properties ("star and wall is push").
+ *  - A rule is NOUN IS PROPERTY, NOUN IS NOUN or NOUN READ NOUN, read
+ *    left → right or top → bottom. AND joins nouns or properties
+ *    ("star and wall is push").
  *  - Text is always PUSH. Objects are walkable unless they are STOP or PUSH.
  *  - YOU: you move every object that is YOU, all at once.
- *  - WIN: the moment an object that is YOU shares a tile with an object that
- *    is WIN — including itself (webb is you + webb is win) — you win.
+ *  - Clearing: the moment an object that is YOU shares a tile with an object
+ *    that is WIN — including itself (webb is you + webb is win) — you win.
+ *  - Interacting: an object that is YOU and READs a kind (webb read bio)
+ *    opens what such an object links to when it steps onto one. On a paper's
+ *    or talk's stage, reading the paper / slides is what clears the stage.
  *  - STOP blocks, PUSH gets pushed, DEFEAT destroys YOU objects on its tile,
  *    SINK destroys itself and whatever shares its tile, HOT destroys MELT
  *    objects on its tile, and an OPEN object meeting a SHUT one destroys both
@@ -18,11 +22,11 @@
  *  - Nothing is YOU? You are stuck: Z undoes, R restarts.
  * Site-only extras: the gates on the bottom row (stand on one and press Enter).
  *
- * Publications is a map instead, as in the game: webb is SELECT and moves only
- * along opened paths and open levels. Each level (01, 02 …) is a selected
- * paper with its own puzzle; Enter plays it. Winning clears the level, offers
- * the paper, and reveals the hidden paths next to it, which open the levels
- * they reach. Cleared levels are remembered in this browser.
+ * Publications and Talks are maps instead, as in the game: webb is SELECT and
+ * moves only along opened paths and open stages. Each stage (01, 02 …) is a
+ * selected paper or a talk with its own puzzle; Enter plays it. Clearing a
+ * stage offers the paper or slides, and reveals the hidden paths next to it,
+ * which open the stages they reach. Cleared stages are remembered in this browser.
  *
  * Board contents live in _data/puzzles.yml; _includes/board.html turns them
  * into JSON for this file.
@@ -31,12 +35,17 @@
   'use strict';
 
   var COLS = 18, ROWS = 9;
-  var KEY_INTRO = 'webb.introDone', KEY_OFF = 'webb.puzzlesOff', KEY_CLEARED = 'webb.cleared';
+  var KEY_INTRO = 'webb.introDone', KEY_OFF = 'webb.puzzlesOff', KEY_CLEARED = 'webb.stages';
   // set just before a gate changes page: where the board sat on screen and whether it was full screen
   var KEY_HOP = 'webb.hop';
   var NOUNS = { WEBB: 'webb', STAR: 'star', WALL: 'wall', PAPER: 'paper', BIO: 'bio', CV: 'cv', MAIL: 'mail', SLIDE: 'slide', KEY: 'key', DOOR: 'door' };
-  // a paper on the map with no puzzle of its own in puzzles.yml gets this one
-  var PLAIN_LEVEL = { name: 'Read me', webb: [3, 4], words: [['WEBB', 1, 1], ['IS', 2, 1], ['YOU', 3, 1], ['PAPER', 6, 4], ['IS', 7, 4], ['WIN', 8, 4]], objects: [{ kind: 'paper', x: 13, y: 4 }] };
+  var VERBS = { IS: true, READ: true };
+  var IDLE = 'Move [you] to go to another page.';
+  // a stage with no puzzle of its own in puzzles.yml gets this one: push the noun up into the sentence
+  function plainLevel(kind) {
+    return { name: 'Read me', webb: [3, 5], objects: [{ kind: kind, x: 13, y: 3 }],
+      words: [['WEBB', 1, 1], ['IS', 2, 1], ['YOU', 3, 1], ['WEBB', 6, 3], ['READ', 7, 3], [kind.toUpperCase(), 8, 6]] };
+  }
 
   var store = {
     get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
@@ -45,8 +54,9 @@
   var boards = [];
   function puzzlesOff() { return store.get(KEY_OFF) === '1'; }
   function setPuzzlesOff(off) { store.set(KEY_OFF, off ? '1' : null); boards.forEach(function (b) { b.render(); }); }
-  function cleared() { return (store.get(KEY_CLEARED) || '').split(',').filter(Boolean).map(Number); }
-  function markCleared(n) { var c = cleared(); if (c.indexOf(n) < 0) { c.push(n); store.set(KEY_CLEARED, c.join(',')); } }
+  // cleared stages, as "papers:<file name>" / "talks:<file name>", so a stage stays cleared when its number changes
+  function cleared() { return (store.get(KEY_CLEARED) || '').split(',').filter(Boolean); }
+  function markCleared(id) { var c = cleared(); if (c.indexOf(id) < 0) { c.push(id); store.set(KEY_CLEARED, c.join(',')); } }
   function two(n) { return (n < 10 ? '0' : '') + n; }
 
   var base = (document.documentElement.getAttribute('data-baseurl') || '').replace(/\/$/, '');
@@ -57,7 +67,7 @@
   // --- words -----------------------------------------------------------------
   function role(w) {
     if (NOUNS[w]) return 's';
-    if (w === 'IS' || w === 'AND') return 'v';
+    if (VERBS[w] || w === 'AND') return 'v';
     return 'o';
   }
   function wordText(w) { return w.toLowerCase(); }
@@ -84,16 +94,21 @@
     slide: '<path d="M3 3h14v9H3z" class="fill"/><path d="M10 12v4M7 16.5h6"/><path d="M5.5 6h5M5.5 8.5h7"/>',
     key: '<circle cx="6.5" cy="10" r="3.6" class="fill"/><circle cx="6.5" cy="10" r="1.2"/><path d="M10.1 10h7.4M14.6 10v3M17.2 10v2.4"/>',
     door: '<path d="M4.5 18V3.5h11V18" class="fill"/><path d="M2.5 18h15M7 6h6v4H7z"/><circle cx="12.6" cy="12.6" r="0.9" class="dot"/>',
-    tree: '<path d="M10 2.5l4.6 6.5h-2.4l3.8 5.5H4l3.8-5.5H5.4z" class="fill"/><path d="M10 14.5v3"/>'
+    tree: '<path d="M10 2.5l4.6 6.5h-2.4l3.8 5.5H4l3.8-5.5H5.4z" class="fill"/><path d="M10 14.5v3"/>',
+    wave: '<path d="M2 8c2-2.2 4-2.2 6 0s4 2.2 6 0 3-1.6 4-1"/><path d="M2 13c2-2.2 4-2.2 6 0s4 2.2 6 0 3-1.6 4-1"/>',
+    fish: '<path d="M3 10c2.5-4 8-4.6 11.5 0-3.5 4.6-9 4-11.5 0z" class="fill"/><path d="M14.5 10l3-3v6z" class="fill"/><circle cx="6.6" cy="9.3" r="0.8" class="dot"/>'
   };
   function sprite(kind) { return '<svg viewBox="0 0 20 20" aria-hidden="true">' + (SVG[kind] || '') + '</svg>'; }
+  // the circuit along the gate row: |ψ⟩ on the left, a measurement on the right
+  var KET = '<svg viewBox="0 0 29 22" aria-hidden="true"><path d="M3 2.5v17"/><text x="12.5" y="15.6" text-anchor="middle">ψ</text><path d="M21 2.5l5 8.5-5 8.5"/></svg>';
+  var METER = '<svg viewBox="0 0 24 18" aria-hidden="true"><rect x="1" y="1" width="22" height="16" rx="1.5" class="fill"/><path d="M5 13.5a7 7 0 0 1 14 0"/><path d="M12 13.5l5-7.5"/></svg>';
   function pct(n, of) { return (n * 100 / of) + '%'; }
 
   // --- rules -------------------------------------------------------------------
   // Read every sentence on the board. Returns which word tiles are part of a
-  // rule, each kind's properties, and noun → noun transformations.
+  // rule, each kind's properties, noun → noun transformations and what each kind reads.
   function readRules(ents) {
-    var at = {}, active = {}, props = {}, turn = {}, keep = {}, list = [];
+    var at = {}, active = {}, props = {}, turn = {}, keep = {}, reads = {}, list = [];
     ents.forEach(function (e) { if (e.t === 'w' && !e.dead) at[e.x + ',' + e.y] = e; });
     var get = function (x, y) { return at[x + ',' + y]; };
     ents.forEach(function (start) {
@@ -105,29 +120,33 @@
         while ((a = get(cur.x + d[0], cur.y + d[1])) && a.w === 'AND' && (n = get(cur.x + 2 * d[0], cur.y + 2 * d[1])) && role(n.w) === 's') {
           subj.push(n); used.push(a, n); cur = n;
         }
-        var is = get(cur.x + d[0], cur.y + d[1]);
-        if (!is || is.w !== 'IS') return;
-        var comp = [], c = get(is.x + d[0], is.y + d[1]), tail = [is];
-        while (c && c.w !== 'IS' && c.w !== 'AND') {
+        var verb = get(cur.x + d[0], cur.y + d[1]);
+        if (!verb || !VERBS[verb.w]) return;
+        var comp = [], c = get(verb.x + d[0], verb.y + d[1]), tail = [verb];
+        // you READ things (nouns), never properties
+        while (c && !VERBS[c.w] && c.w !== 'AND' && (verb.w !== 'READ' || NOUNS[c.w])) {
           comp.push(c); tail.push(c);
           a = get(c.x + d[0], c.y + d[1]); n = a && get(c.x + 2 * d[0], c.y + 2 * d[1]);
-          if (a && a.w === 'AND' && n && n.w !== 'IS' && n.w !== 'AND') { tail.push(a); c = n; } else break;
+          if (a && a.w === 'AND' && n && !VERBS[n.w] && n.w !== 'AND') { tail.push(a); c = n; } else break;
         }
         if (!comp.length) return;
         used.concat(tail).forEach(function (t) { active[t.id] = true; });
         subj.forEach(function (s) {
           var k = NOUNS[s.w];
           comp.forEach(function (w) {
-            list.push(s.w + ' ' + w.w);
-            if (NOUNS[w.w]) { if (NOUNS[w.w] === k) keep[k] = true; else (turn[k] = turn[k] || []).push(NOUNS[w.w]); }
+            list.push(s.w + ' ' + verb.w + ' ' + w.w);
+            if (verb.w === 'READ') { reads[k] = reads[k] || {}; reads[k][NOUNS[w.w]] = true; }
+            else if (NOUNS[w.w]) { if (NOUNS[w.w] === k) keep[k] = true; else (turn[k] = turn[k] || []).push(NOUNS[w.w]); }
             else { props[k] = props[k] || {}; props[k][w.w] = true; }
           });
         });
       });
     });
-    return { active: active, props: props, turn: turn, keep: keep, list: list };
+    return { active: active, props: props, turn: turn, keep: keep, reads: reads, list: list };
   }
   function has(R, kind, p) { return !!(R.props[kind] && R.props[kind][p]); }
+  // does something that is YOU read this kind of object?
+  function readByYou(R, kind) { return Object.keys(R.reads).some(function (k) { return R.reads[k][kind] && has(R, k, 'YOU'); }); }
   // an OPEN object and a SHUT one cancel out when they meet
   function opens(R, a, b) {
     return a.t === 'o' && b.t === 'o' && ((has(R, a.kind, 'OPEN') && has(R, b.kind, 'SHUT')) || (has(R, a.kind, 'SHUT') && has(R, b.kind, 'OPEN')));
@@ -146,6 +165,7 @@
     this.caption = fig.querySelector('[data-caption]');
     if (this.caption) this.caption.innerHTML = this.caption.innerHTML.replace(/\[([^\]<>]+)\]/g, function (m) { return chips(m); });
     this.build();
+    if (this.def.theme) this.el.grid.classList.add('is-' + this.def.theme);
     this.g = { stage: 'play', lesson: 0, level: 0, cur: null, sel: 0, card: null, winSig: '', msg: '', ents: [], undo: [], focused: false };
     if (!this.def.map && (this.introMode === 'always' || (this.introMode === 'auto' && store.get(KEY_INTRO) !== '1'))) this.g.stage = 'intro';
     else this.load();
@@ -196,31 +216,27 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
   };
 
-  // Turn the YAML level (plus the selected papers' map / talks) into words + objects.
+  // Turn the YAML level (plus, for a map, the selected papers or talks) into words + objects.
   Board.prototype.buildLevel = function () {
     var D = this.D, L = D.level;
     if (!L) return null;
-    var def = { here: L.here || '', spawn: L.spawn || 2, hint: L.hint || '', words: (D.you || []).concat(L.words || []), objects: (L.objects || []).slice() };
-    if (L.map) {
-      def.map = this.buildMap(L.map);
-    } else if (L.auto === 'talks') {
-      (D.talks || []).slice(0, (L.slots || []).length).forEach(function (t, i) {
-        var ext = /^https?:/.test(t.url);
-        def.objects.push({ kind: 'slide', x: L.slots[i][0], y: L.slots[i][1], caption: t.label + ' · ' + t.year, label: t.label, url: t.url, external: ext, action: 'Open the slides ' + (ext ? '↗' : '→') });
-      });
-    }
+    var def = { here: L.here || '', spawn: L.spawn || 2, theme: L.theme || '', words: (D.you || []).concat(L.words || []), objects: (L.objects || []).slice() };
+    if (L.map) def.map = this.buildMap(L.map);
     return def;
   };
 
-  // The map: one level per selected paper, and paths drawn as straight runs
-  // from → via … → to. A path with `after: n` stays hidden until level n is cleared.
+  // The map: one stage per item (`items: papers` or `talks`, [1] = newest), on the
+  // node with the same number, and paths drawn as straight runs from → via … → to.
+  // A path with `need: n` is drawn only when there is an item n; one with `after: n`
+  // stays hidden until stage n is cleared.
   Board.prototype.buildMap = function (M) {
-    var papers = this.D.papers || [];
+    var id = M.items || 'papers', items = this.D[id] || [];
+    var item = function (n) { return items.filter(function (x) { return +x.n === +n; })[0]; };
     var nodes = (M.nodes || []).map(function (nd) {
-      var p = papers.filter(function (x) { return +x.n === +nd.n; })[0];
-      return p ? { n: +nd.n, x: nd.x, y: nd.y, paper: p } : null;
+      var it = item(nd.n);
+      return it ? { n: +nd.n, x: nd.x, y: nd.y, item: it } : null;
     }).filter(Boolean);
-    var paths = (M.paths || []).map(function (l) {
+    var paths = (M.paths || []).filter(function (l) { return !l.need || item(l.need); }).map(function (l) {
       var pts = [l.from].concat(l.via || [], [l.to]), tiles = [l.from];
       for (var i = 0; i + 1 < pts.length; i++) {
         var a = pts[i], b = pts[i + 1], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]);
@@ -228,19 +244,23 @@
       }
       return { pts: pts, tiles: tiles, after: +l.after || 0 };
     });
-    return { nodes: nodes, paths: paths, decor: M.decor || [], rule: M.rule || [], puzzles: M.puzzles || {} };
+    return { id: id, kind: M.kind || 'paper', item: item, nodes: nodes, paths: paths, decor: M.decor || [], rule: M.rule || [], puzzles: M.puzzles || {} };
+  };
+  Board.prototype.isDone = function (n) {
+    var M = this.def.map, it = M.item(n);
+    return !!it && cleared().indexOf(M.id + ':' + it.key) >= 0;
   };
 
-  // Which paths are revealed, which levels are open or cleared, and where webb may walk.
+  // Which paths are revealed, which stages are open or cleared, and where webb may walk.
   Board.prototype.mapState = function () {
-    var M = this.def.map, done = cleared(), walk = {}, xs = (this.D.gates || []).map(function (gt) { return gt.x; });
+    var M = this.def.map, self = this, walk = {}, xs = (this.D.gates || []).map(function (gt) { return gt.x; });
     for (var x = Math.min.apply(null, xs); x <= Math.max.apply(null, xs); x++) walk[x + ',' + (ROWS - 1)] = true;   // the gate row
     M.paths.forEach(function (p) {
-      p.shown = !p.after || done.indexOf(p.after) >= 0;
+      p.shown = !p.after || self.isDone(p.after);
       if (p.shown) p.tiles.forEach(function (t) { walk[t[0] + ',' + t[1]] = true; });
     });
-    // a revealed path opens the levels it touches, and goes no further
-    M.nodes.forEach(function (nd) { nd.open = !!walk[nd.x + ',' + nd.y]; nd.done = done.indexOf(nd.n) >= 0; });
+    // a revealed path opens the stages it touches, and goes no further
+    M.nodes.forEach(function (nd) { nd.open = !!walk[nd.x + ',' + nd.y]; nd.done = self.isDone(nd.n); });
     this.walk = walk;
   };
   Board.prototype.nodeUnder = function () {
@@ -249,15 +269,15 @@
     return this.def.map.nodes.filter(function (nd) { return nd.open && nd.x === c.x && nd.y === c.y; })[0] || null;
   };
   Board.prototype.nodeFor = function (n) { return this.def.map.nodes.filter(function (nd) { return nd.n === n; })[0]; };
-  Board.prototype.puzzleFor = function (n) { return this.def.map.puzzles[n] || PLAIN_LEVEL; };
+  Board.prototype.puzzleFor = function (n) { var M = this.def.map; return M.puzzles[this.nodeFor(n).item.key] || plainLevel(M.kind); };
 
   Board.prototype.build = function () {
     var fig = this.fig, mount = fig.querySelector('.board__mount'), self = this;
     mount.innerHTML =
       '<div class="board__tut" data-block="Q-a" hidden></div>' +
-      '<div class="board__scroll"><section class="board__grid" data-block="Q-b" tabindex="0">' +
-        '<div class="board__wire" aria-hidden="true"></div><div class="board__psi" aria-hidden="true">|ψ〉</div>' +
-        '<div class="board__gates" aria-hidden="true"></div><div class="board__map" aria-hidden="true" hidden></div><div class="board__layer" aria-hidden="true"></div>' +
+      '<div class="board__scroll"><section class="board__grid" data-block="Q-b" tabindex="0"><div class="board__field">' +
+        '<div class="board__wire" aria-hidden="true"></div><div class="board__psi" aria-hidden="true">' + KET + '</div><div class="board__meter" aria-hidden="true">' + METER + '</div>' +
+        '<div class="board__gates" aria-hidden="true"></div><div class="board__map" aria-hidden="true" hidden></div><div class="board__layer" aria-hidden="true"></div></div>' +
         '<div class="board__intro" data-block="Q-c" hidden></div><div class="board__over" data-block="Q-d" hidden></div>' +
         '<div class="board__chip" aria-hidden="true">Click to play</div>' +
       '</section></div>' +
@@ -281,7 +301,7 @@
     var q = function (s) { return mount.querySelector(s); };
     this.el = {
       tut: q('.board__tut'), scroll: q('.board__scroll'), grid: q('.board__grid'), gates: q('.board__gates'), layer: q('.board__layer'), map: q('.board__map'),
-      wire: q('.board__wire'), psi: q('.board__psi'), intro: q('.board__intro'), over: q('.board__over'), chip: q('.board__chip'),
+      wire: q('.board__wire'), psi: q('.board__psi'), meter: q('.board__meter'), intro: q('.board__intro'), over: q('.board__over'), chip: q('.board__chip'),
       bar: q('.board__bar'), status: q('.board__status'), act: q('.board__act'), act2: q('.board__act2'), pad: q('.board__pad'),
       links: q('.board__links'), replay: q('.board__replay'), hide: q('.board__hide'), off: q('.board__off'), show: q('.board__show')
     };
@@ -306,7 +326,7 @@
       if (e.target.closest('.board__skip')) { self.load(); self.render(); self.focus(); }
       if (e.target.closest('.board__back')) { self.toMap(); self.focus(); }
     });
-    // on the map the main button plays the level webb stands on instead of following a link
+    // on the map the main button plays the stage webb stands on instead of following a link
     el.act.addEventListener('click', function (e) {
       var n = el.act.getAttribute('data-level');
       if (n) { e.preventDefault(); self.enter(+n); self.focus(); }
@@ -374,7 +394,7 @@
     this.settle(true);
   };
 
-  // Back to the map — onto the level just played, as in the game.
+  // Back to the map — onto the stage just played, as in the game.
   Board.prototype.toMap = function (fresh) {
     var g = this.g, nd = !fresh && g.level ? this.nodeFor(g.level) : null;
     g.stage = 'map'; g.card = null; g.msg = ''; g.ents = []; g.winSig = '';
@@ -445,7 +465,7 @@
     this.render();
   };
 
-  // After a move: transform, destroy, then check for a win.
+  // After a move: transform, destroy, then check for a win or a read.
   Board.prototype.settle = function (quiet) {
     var g = this.g, R = readRules(g.ents), self = this;
     this.alive().forEach(function (e) {
@@ -464,32 +484,36 @@
     var yous = this.alive().filter(function (e) { return e.t === 'o' && has(R, e.kind, 'YOU'); });
     if (!yous.length && !quiet) g.msg = 'Nothing is [you] any more — press Z to undo or R to restart.';
 
-    var win = this.findWin(R, yous);
-    var sig = win ? win.sig : '';
+    var hit = this.findHit(R, yous);
+    var sig = hit ? hit.sig : '';
     if (sig && sig !== g.winSig && !quiet) {
-      if (g.stage === 'tut') g.card = Object.assign({ lesson: true, rule: win.rule }, (this.D.tutorial[g.lesson - 1] || {}).done || { title: 'Done.' });
-      else if (g.stage === 'level') g.card = this.levelCard(win);
-      else g.card = win;
+      if (g.stage === 'tut') g.card = Object.assign({ lesson: true, rule: hit.rule }, (this.D.tutorial[g.lesson - 1] || {}).done || { title: 'Done.' });
+      else if (g.stage === 'level') g.card = this.levelCard(hit);
+      else g.card = hit;
     }
     g.winSig = sig;
     this.R = R;
   };
 
-  // What does a YOU object stand on? Prefer a WIN object other than itself;
-  // an object that is both YOU and WIN wins on its own.
-  Board.prototype.findWin = function (R, yous) {
-    var all = this.alive().filter(function (e) { return e.t === 'o'; }), best = null;
+  // What does a YOU object stand on? A WIN object clears the stage; an object
+  // that it READs is an interaction. Prefer an object other than itself — an
+  // object that is both YOU and WIN wins on its own.
+  Board.prototype.findHit = function (R, yous) {
+    var all = this.alive().filter(function (e) { return e.t === 'o'; }), best = null, stage = this.g.stage, map = this.def.map;
     yous.forEach(function (y) {
       all.forEach(function (o) {
         if (o.x !== y.x || o.y !== y.y) return;
-        var self = o === y, noun = o.kind.toUpperCase(), c = null;
+        var self = o === y, noun = o.kind.toUpperCase(), who = cap(o.kind), c = null;
         if (has(R, o.kind, 'WIN')) {
-          var who = cap(o.kind);
           if (self) c = { sig: o.id + ':self', rule: '[' + noun + ' is you] [' + noun + ' is win]', title: who + ' is you, and ' + o.kind + ' is win.',
             text: 'Being the goal yourself counts — that is how the rules work. Nothing opens here, but you win.' };
-          else if (o.url) c = { sig: o.id + ':win', rule: '[' + noun + ' is win]', title: (o.label || who) + ' is win.', text: '', url: o.url, external: !!o.external, action: o.action || 'Open →' };
-          else if (o.message) c = { sig: o.id + ':win', rule: '[' + noun + ' is win]', title: (o.label || who) + ' is win.', text: o.message };
-          else c = { sig: o.id + ':win', rule: '[' + noun + ' is win]', title: who + ' is win.', text: 'You reached it.' };
+          else c = { sig: o.id + ':win', rule: '[' + noun + ' is win]', title: (o.label || who) + ' is win.', text: o.message || (o.url ? '' : 'You reached it.'),
+            url: o.url, external: !!o.external, action: o.action || 'Open →' };
+        } else if (!self && R.reads[y.kind] && R.reads[y.kind][o.kind]) {
+          // on a page board only things with something to show; on a stage only its paper / slides
+          var counts = stage === 'tut' || (stage === 'level' ? o.kind === map.kind : !!(o.url || o.message));
+          if (counts) c = { sig: o.id + ':read', rule: '[' + y.kind.toUpperCase() + ' read ' + noun + ']', title: o.label || who, text: o.message || '',
+            url: o.url, external: !!o.external, action: o.action || 'Open →' };
         }
         if (c && (!best || (best.sig.indexOf(':self') > 0 && c.sig.indexOf(':self') < 0))) best = c;
       });
@@ -497,15 +521,12 @@
     return best;
   };
 
-  // Winning a paper's level clears it and offers the paper.
-  Board.prototype.levelCard = function (win) {
-    var n = this.g.level, p = this.nodeFor(n).paper, first = cleared().indexOf(n) < 0;
-    var more = first && this.def.map.paths.some(function (l) { return l.after === n; });
-    markCleared(n);
-    var links = [];
-    if (p.arxiv) links.push({ url: p.arxiv, label: 'Read it on arXiv ↗' });
-    if (p.pub) links.push({ url: p.pub, label: 'Published version ↗' });
-    return { level: true, sig: win.sig, rule: win.rule, title: 'Level ' + two(n) + ' cleared.', text: p.title, links: links,
+  // Clearing a stage (reading its paper / slides, or any win) offers what it links to.
+  Board.prototype.levelCard = function (hit) {
+    var n = this.g.level, M = this.def.map, it = this.nodeFor(n).item, id = M.id + ':' + it.key, first = cleared().indexOf(id) < 0;
+    var more = first && M.paths.some(function (l) { return l.after === n; });
+    markCleared(id);
+    return { level: true, sig: hit.sig, rule: hit.rule, title: 'Stage ' + two(n) + ' cleared.', text: it.title, links: it.links || [],
       note: more ? 'New paths have opened on the map.' : '' };
   };
 
@@ -537,8 +558,8 @@
     }
     if (g.stage === 'play') {
       if (this.gateUnder() && !this.el.act.hidden) { this.el.act.click(); return; }
-      var win = this.findWin(readRules(g.ents), this.alive().filter(function (e) { return e.t === 'o' && has(readRules(g.ents), e.kind, 'YOU'); }));
-      if (win) { g.card = win; this.render(); }
+      var R = readRules(g.ents), hit = this.findHit(R, this.alive().filter(function (e) { return e.t === 'o' && has(R, e.kind, 'YOU'); }));
+      if (hit) { g.card = hit; this.render(); }
     }
   };
   Board.prototype.choose = function (i) {
@@ -600,10 +621,10 @@
     el.grid.classList.toggle('is-intro', intro);
     el.grid.setAttribute('aria-label', (intro
       ? 'Welcome. ' + ((this.D.welcome || {}).question || '') + ' Choose with W and S or the arrow keys, confirm with Enter.'
-      : map ? 'Map of selected papers. Move along the paths with W A S D or the arrow keys. Stand on a numbered level and press Enter to play its puzzle, or on a gate along the bottom to change page.'
-      : level ? 'Puzzle for paper ' + g.level + '. Move with W A S D or the arrow keys. Z undoes, R restarts, Escape goes back to the map.'
+      : map ? 'Map of stages. Move along the paths with W A S D or the arrow keys. Stand on a numbered stage and press Enter to play its puzzle, or on a gate along the bottom to change page.'
+      : level ? 'Puzzle for stage ' + g.level + '. Move with W A S D or the arrow keys. Z undoes, R restarts, Escape goes back to the map.'
       : 'Puzzle board. Move with W A S D or the arrow keys. Z undoes, R restarts. Stand on a gate along the bottom and press Enter to change page.') + ' F toggles full screen.');
-    el.wire.hidden = el.psi.hidden = el.gates.hidden = !(play || map);
+    el.wire.hidden = el.psi.hidden = el.meter.hidden = el.gates.hidden = !(play || map);
     el.layer.hidden = intro || map;
     el.map.hidden = !map;
     el.pad.hidden = intro;
@@ -622,8 +643,8 @@
         return '<li class="' + (cur ? 'is-current' : ok ? 'is-done' : '') + '"' + (cur ? ' aria-current="step"' : '') + '><span class="num">' + n + '</span>' + esc(t.title) + '</li>';
       }).join('') + '</ol></div><button type="button" class="btn board__skip">Skip the tutorial →</button>';
     } else if (level && this.tutSig !== tutSig) {
-      var lp = this.nodeFor(g.level).paper;
-      el.tut.innerHTML = '<div class="board__steps"><span class="eyebrow">Level ' + two(g.level) + '</span>' +
+      var lp = this.nodeFor(g.level).item;
+      el.tut.innerHTML = '<div class="board__steps"><span class="eyebrow">Stage ' + two(g.level) + '</span>' +
         '<span class="board__level-name">' + esc(this.puzzleFor(g.level).name || '') + '</span>' +
         '<span class="board__level-paper">[' + g.level + '] ' + esc(lp.label) + '</span></div>' +
         '<button type="button" class="btn board__back"><kbd>Esc</kbd>Back to the map</button>';
@@ -635,31 +656,35 @@
     if (play || map) this.renderGates();
     this.renderCard();
 
-    // status line + gate / level buttons
+    // status line + gate / stage buttons
     var status = '', big = false, gate = play || map ? this.gateUnder() : null, node = map && !g.card ? this.nodeUnder() : null;
+    var kind = this.def.map ? this.def.map.kind : '';
     if (intro) status = 'Use W and S (or ↑ ↓) to pick an answer, then press Enter — or just click one.';
-    else if (g.card && g.card.level) status = g.card.links.length ? 'Enter opens the paper · Esc goes back to the map.' : 'Press Enter to go back to the map.';
-    else if (g.card) status = g.card.lesson ? 'Press Enter to continue.' : 'Enter opens it · Esc or any move keeps playing.';
+    else if (g.card && g.card.level) status = g.card.links.length ? 'Enter opens it; Esc goes back to the map.' : 'Press Enter to go back to the map.';
+    else if (g.card) status = g.card.lesson ? 'Press Enter to continue.' : g.card.url ? 'Enter opens it; Esc or any move keeps playing.' : 'Esc or any move keeps playing.';
     else if (tut) { status = ((this.D.tutorial || [])[g.lesson - 1] || {}).hint || ''; big = true; }
-    else if (level) status = 'Make a rule that lets you win. Z undoes, R restarts, Esc goes back to the map.';
-    else if (node) status = 'Level ' + two(node.n) + ' — [' + node.n + '] ' + esc(node.paper.label) + (node.done ? ' (cleared). Press Enter to play it again.' : '. Press Enter to play.');
-    else if (gate) status = gate.id === this.def.here ? 'You are here: ' + gate.label + '.' : 'Gate ' + gate.letter + ' — ' + gate.label + '.';
-    else if (g.winSig) status = 'You are on a win — press Enter to see it again.';
-    else if (map) status = this.def.hint;
-    else status = g.focused || g.msg ? this.def.hint : 'Click the board, then use W A S D. Stand on a gate and press Enter to change page.';
+    else if (level) status = 'Make [webb read ' + kind + '], then walk onto the ' + (kind === 'slide' ? 'slides' : kind) + '. Z undoes, R restarts, Esc goes back to the map.';
+    else if (node) status = '[' + node.n + '] ' + esc(node.item.title) + (node.done ? ' (cleared). Press Enter to play it again.' : '. Press Enter to play.');
+    else if (gate) status = gate.id === this.def.here ? esc(gate.label) : '';   // another page's gate: just its button
+    else if (g.winSig) status = 'Press Enter to see it again.';
+    else status = IDLE;
     if (g.msg && !intro && !g.card) { status = g.msg; big = false; }
-    el.status.innerHTML = node ? status : chips(status);   // "[1]" on a level is a paper number, not a rule
+    el.status.innerHTML = node ? status : chips(status);   // "[1]" on a stage is a paper / talk number, not a rule
+    el.status.hidden = !status;
     el.status.classList.toggle('is-big', big);
     el.status.classList.toggle('is-warn', g.msg.indexOf('Nothing') === 0);
     var showGate = !!(gate && gate.id !== this.def.here && !g.card);
     el.act.hidden = !(showGate || node);
     el.act.removeAttribute('data-level');
-    if (node) { el.act.setAttribute('href', '#'); el.act.setAttribute('data-level', node.n); el.act.querySelector('span').textContent = 'Play level ' + two(node.n) + ' →'; }
-    else if (showGate) { el.act.setAttribute('href', href(gate.url)); el.act.querySelector('span').textContent = 'Go to ' + gate.label + ' →'; }
-    // a cleared level also links straight to its paper
-    var read = node && node.done ? node.paper.arxiv || node.paper.pub : '';
+    if (node) { el.act.setAttribute('href', '#'); el.act.setAttribute('data-level', node.n); el.act.querySelector('span').textContent = 'Play'; }
+    else if (showGate) { el.act.setAttribute('href', href(gate.url)); el.act.querySelector('span').textContent = gate.label; }
+    // a cleared stage also links straight to its paper / slides
+    var read = node && node.done ? (node.item.links || [])[0] : null;
     el.act2.hidden = !read;
-    if (read) { el.act2.setAttribute('href', read); el.act2.textContent = node.paper.arxiv ? 'arXiv ↗' : 'Published ↗'; }
+    if (read) {
+      el.act2.setAttribute('href', href(read.url)); el.act2.textContent = read.short;
+      if (read.external) el.act2.setAttribute('target', '_blank'); else el.act2.removeAttribute('target');
+    }
   };
 
   // The win card over the board. Rebuilt only when it changes, so its buttons keep working.
@@ -673,7 +698,7 @@
     if (c.lesson) btns = '<button type="button" class="btn btn--primary" data-card="next"><kbd>Enter</kbd>' + esc(c.action || 'Continue →') + '</button>';
     else if (c.level) {
       btns = c.links.map(function (l, i) {
-        return '<a class="btn' + (i ? '' : ' btn--primary') + '" data-card="' + (i ? 'link' : 'go') + '" href="' + esc(l.url) + '" target="_blank" rel="noopener noreferrer">' + (i ? '' : '<kbd>Enter</kbd>') + esc(l.label) + '</a>';
+        return '<a class="btn' + (i ? '' : ' btn--primary') + '" data-card="' + (i ? 'link' : 'go') + '" href="' + esc(href(l.url)) + '"' + (l.external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + (i ? '' : '<kbd>Enter</kbd>') + esc(l.label) + '</a>';
       }).join('') + '<button type="button" class="btn' + (c.links.length ? '' : ' btn--primary') + '" data-card="map"><kbd>' + (c.links.length ? 'Esc' : 'Enter') + '</kbd>Back to the map</button>';
     } else {
       if (c.url) btns += '<a class="btn btn--primary" data-card="go" href="' + esc(href(c.url)) + '"' + (c.external ? ' target="_blank" rel="noopener noreferrer"' : '') + '><kbd>Enter</kbd>' + esc(c.action) + '</a>';
@@ -712,8 +737,7 @@
     this.el.gates.innerHTML = (this.D.gates || []).map(function (gt) {
       var isHere = gt.id === here, standing = gt.id === on;
       return '<div class="gate' + (isHere ? ' is-here' : '') + (standing && !isHere ? ' is-standing' : '') + '" style="left:' + pct(gt.x, COLS) + ';top:' + pct(ROWS - 1, ROWS) + '">' +
-        '<span class="gate__box">' + esc(gt.letter) + '</span><span class="gate__label">' +
-        esc(standing && !isHere ? 'Enter ↵ ' + gt.label : isHere ? gt.label + ' · here' : gt.label) + '</span></div>';
+        '<span class="gate__box">' + esc(gt.letter) + '</span><span class="gate__label">' + esc(gt.label) + '</span></div>';
     }).join('');
   };
 
@@ -746,15 +770,16 @@
         n.className = 'tile tile--obj tile--' + e.kind;
         n.querySelector('.tile__sprite').innerHTML = sprite(e.kind);
       }
-      var win = has(R, e.kind, 'WIN');
+      var win = has(R, e.kind, 'WIN'), read = !win && readByYou(R, e.kind);
       n.classList.toggle('is-win', win);
+      n.classList.toggle('is-read', read);
       n.classList.toggle('is-solid', has(R, e.kind, 'STOP') || has(R, e.kind, 'PUSH'));
-      n.querySelector('.tile__tag').textContent = win ? 'win' : '';
+      n.querySelector('.tile__tag').textContent = win ? 'win' : read ? 'read' : '';
       n.querySelector('.tile__cap').textContent = e.caption || '';
     });
   };
 
-  // The map: paths, decoration and level icons are rebuilt only when what is
+  // The map: paths, decoration and stage icons are rebuilt only when what is
   // cleared changes (newly revealed paths fade in); webb just moves.
   Board.prototype.renderMap = function () {
     var M = this.def.map, g = this.g, el = this.el, self = this, sig = cleared().join(',');
@@ -778,7 +803,7 @@
       M.rule.forEach(function (w) { var W = String(w[0]).toUpperCase(); html += '<div class="tile tile--word tile--' + role(W) + ' is-on" style="' + box(w[1], w[2]) + '"><span>' + esc(wordText(W)) + '</span></div>'; });
       M.nodes.forEach(function (nd) {
         html += '<div class="node' + (nd.done ? ' is-done' : nd.open ? ' is-open' : ' is-locked') + '" data-node="' + nd.n + '" style="' + box(nd.x, nd.y) + '">' +
-          '<span class="node__box">' + two(nd.n) + '</span><span class="node__label"></span></div>';
+          '<span class="node__box">' + two(nd.n) + '</span></div>';
       });
       var done = M.nodes.filter(function (nd) { return nd.done; }).length;
       html += '<span class="map__count">' + done + ' / ' + M.nodes.length + ' cleared</span>' +
@@ -790,9 +815,7 @@
     cursor.style.left = pct(c.x, COLS);
     cursor.style.top = pct(c.y, ROWS);
     Array.prototype.forEach.call(el.map.querySelectorAll('.node'), function (n) {
-      var nd = self.nodeFor(+n.getAttribute('data-node')), standing = on === nd;
-      n.classList.toggle('is-standing', standing);
-      n.querySelector('.node__label').textContent = standing ? 'Enter ↵ ' + two(nd.n) + ' · ' + nd.paper.label : '';
+      n.classList.toggle('is-standing', on === self.nodeFor(+n.getAttribute('data-node')));
     });
   };
 

@@ -1,0 +1,7 @@
+# ---------------------------------------------------------------------------
+# Home › News, newest first. `when` is the date as shown; `text` may use
+# Markdown (e.g. [a link](https://…)).
+# ---------------------------------------------------------------------------
+
+- when: "Nov 2026"
+  text: "A major update to this homepage!"

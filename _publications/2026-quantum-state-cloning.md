@@ -3,9 +3,9 @@ title: "Optimal copy complexity of quantum state cloning"
 short_title: "Quantum state cloning"
 authors: ["Sangwoo Jeon", "Vaughn Sohn", "Changhun Oh"]
 venue: "arXiv preprint"
-date: 2026-08-31
+date: 2026-08-25
 type: preprint
-selected: 2
+selected: true
 arxiv: "2608.24484"
 summary: "The optimal copy complexity of quantum state cloning."
 bibtex: |

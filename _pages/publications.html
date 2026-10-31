@@ -12,12 +12,14 @@ redirect_from:
 ---
 {%- comment -%}
   Built from _publications/*.md (one file per paper).
-  `selected: 1`, `selected: 2`, … in a paper's front matter puts it in “Selected”
-  under that number — the same number as its level (01, 02 …) on the map.
-  The map and each level's puzzle are in _data/puzzles.yml (levels › publications).
+  `selected: true` in a paper's front matter puts it in “Selected papers”. They are
+  numbered by date, newest first — a new paper becomes [1] — and [n] is also the
+  stage 0n on the map. The map and each paper's puzzle are in _data/puzzles.yml
+  (levels › publications).
 {%- endcomment -%}
 {%- assign profile = site.data.profile -%}
 {%- assign papers = site.publications | sort: "date" | reverse -%}
+{%- assign selected = site.publications | where_exp: "p", "p.selected" | sort: "date" | reverse -%}
 {%- assign by_year = papers | group_by_exp: "p", "p.date | date: '%Y'" -%}
 {%- assign n_pre = papers | where: "type", "preprint" | size -%}
 {%- assign n_jour = papers | where: "type", "journal" | size -%}
@@ -25,33 +27,29 @@ redirect_from:
 
 <div class="page-head">
   <h1 data-block="P-a">Publications</h1>
-  <p class="lede" data-block="P-b">Selected papers first{% if site.puzzles %} — they are also playable in Figure 1{% endif %}. The complete list follows, newest first. Also on <a href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Google Scholar</a>.</p>
 </div>
 
 <section class="section" aria-labelledby="h-sel" style="margin-top: 56px">
-  <h2 id="h-sel" class="section-title" data-block="P-c"><span class="num">1</span>Selected</h2>
+  <h2 id="h-sel" class="section-title" data-block="P-c"><span class="num">1</span>Selected papers</h2>
   {% if site.puzzles %}
-  <p class="prose measure" style="margin: 14px 0 0" data-block="P-d">The selected papers are levels on a map. On the map <span class="rule"><span class="rw rw--s">webb</span><span class="rw rw--v">is</span><span class="rw rw--o">select</span></span>: walk the paths to level 01, 02 … — paper [1], [2] … below — and press Enter to play its own small puzzle, in any order you like. Clearing a level opens the paper.</p>
+  <p class="prose measure" style="margin: 14px 0 0" data-block="P-d">Walk to the stage with a paper's number and press Enter to go in; there, you can <em>read</em> the paper.</p>
   <div style="margin-top: 26px">
-    {% include board.html level="publications" block="P-e" cap_block="P-f" fig="Figure 1." caption="The map of selected papers. Stand on a level and press Enter to play it; Esc goes back to the map. Cleared levels stay cleared in this browser. The gates along the bottom lead to the other pages." %}
+    {% include board.html level="publications" block="P-e" cap_block="P-f" fig="Figure 1." caption="The map of selected papers. Stand on a stage and press Enter to play it; Esc goes back to the map. Cleared stages stay cleared in this browser. The gates along the bottom lead to the other pages." %}
   </div>
   {% endif %}
   <ol class="pubs measure-wide" style="margin-top: 30px" data-block="P-g">
-    {%- for n in (1..9) -%}{%- for p in site.publications -%}{%- if p.selected == n %}
-    <li class="pub" id="selected-{{ n }}">
-      <span class="pub__n">[{{ n }}]</span>
-      <div>
-        {% include paper-ref.html paper=p bibtex=true %}
-        {% if p.summary %}<p class="pub__summary">{{ p.summary }}</p>{% endif %}
-      </div>
+    {%- for p in selected %}
+    <li class="pub" id="selected-{{ forloop.index }}">
+      <span class="pub__n">[{{ forloop.index }}]</span>
+      <div>{% include paper-ref.html paper=p bibtex=true %}</div>
     </li>
-    {%- endif -%}{%- endfor -%}{%- endfor %}
+    {%- endfor %}
   </ol>
 </section>
 
 <section class="section measure-wide" aria-labelledby="h-all">
   <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px" data-block="P-h">
-    <h2 id="h-all" class="section-title"><span class="num">2</span>All papers</h2>
+    <h2 id="h-all" class="section-title"><span class="num">2</span>Recent publications</h2>
     <div class="filters" role="group" aria-label="Filter papers" data-pub-filters hidden>
       <button type="button" data-filter="all" aria-pressed="true">All <span class="count">{{ papers.size }}</span></button>
       {% if n_pre > 0 %}<button type="button" data-filter="preprint" aria-pressed="false">Preprints <span class="count">{{ n_pre }}</span></button>{% endif %}
@@ -68,11 +66,12 @@ redirect_from:
       <li class="pub pub--plain" data-pub data-type="{{ p.type }}">
         <div>
           {% include paper-ref.html paper=p type=true bibtex=true %}
-          {% if p.selected %}<p class="meta" style="margin-top: 4px">Selected [{{ p.selected }}]</p>{% endif %}
+          {%- for s in selected %}{% if s.path == p.path %}<p class="meta" style="margin-top: 4px">Selected [{{ forloop.index }}]</p>{% endif %}{% endfor %}
         </div>
       </li>
       {% endfor %}
     </ul>
   </div>
   {% endfor %}
+  <p class="meta" style="margin-top: 28px" data-block="P-j">You can see the full list of papers on <a href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Google Scholar</a>.</p>
 </section>

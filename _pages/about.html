@@ -23,9 +23,8 @@ redirect_from:
   {%- endcomment -%}
   <div>
     <h1 data-block="A-a">About me</h1>
-    <p class="lede" data-block="A-b">{{ profile.name }} · {{ profile.role }}, {{ profile.affiliation }} · {{ profile.location }}</p>
     <div class="btn-row" data-block="A-c">
-      <a class="btn btn--primary" href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">CV (PDF) ↗</a>
+      <a class="btn" href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">CV (PDF) ↗</a>
       <a class="btn" href="mailto:{{ profile.email }}">Email</a>
       <a class="btn" href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Scholar ↗</a>
       <a class="btn" href="{{ profile.links.github }}" target="_blank" rel="noopener">GitHub ↗</a>
@@ -34,7 +33,7 @@ redirect_from:
 </div>
 
 <div class="section--tight" style="margin-top: 44px">
-  {% include board.html level="about" block="A-d" cap_block="A-e" fig="Figure 0." caption="About, as a board. Push [win] up the column — bio, CV or contact opens. The gates along the bottom lead to the other pages." %}
+  {% include board.html level="about" block="A-d" cap_block="A-e" fig="Figure 0." caption="About page." %}
 </div>
 
 <section id="bio" class="section split" aria-labelledby="h-bio">
@@ -46,10 +45,8 @@ redirect_from:
     </div>
   </div>
   <aside class="split__aside" data-block="A-g">
-    <p class="eyebrow">Interests</p>
-    <p>{{ profile.interests | join: " · " }}</p>
     <p class="eyebrow">Recent topics</p>
-    <p>{{ profile.recent_topics | join: " · " }}</p>
+    <p>{{ profile.recent_topics | join: "<br>" }}</p>
   </aside>
 </section>
 
@@ -75,7 +72,6 @@ redirect_from:
   <h2 id="h-contact" class="section-title"><span class="num">4</span>Contact</h2>
   <dl class="kv">
     <dt>Email</dt><dd><a href="mailto:{{ profile.email }}">{{ profile.email }}</a></dd>
-    <dt>Office</dt><dd>{{ profile.affiliation }} · {{ profile.location }}</dd>
     <dt>Scholar</dt><dd><a href="{{ profile.links.scholar }}" target="_blank" rel="noopener">Google Scholar profile</a></dd>
     <dt>GitHub</dt><dd><a href="{{ profile.links.github }}" target="_blank" rel="noopener">{{ profile.links.github | remove: "https://" }}</a></dd>
     <dt>CV</dt><dd><a href="{{ profile.links.cv | relative_url }}" target="_blank" rel="noopener">PDF</a>{% if profile.links.cv_updated %} <span class="meta" style="display: inline">(updated {{ profile.links.cv_updated }})</span>{% endif %}</dd>

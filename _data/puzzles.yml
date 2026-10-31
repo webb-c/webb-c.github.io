@@ -2,22 +2,27 @@
 # Puzzle boards. Every board is an 18 × 9 grid: x = 0–17 (left → right),
 # y = 0–8 (top → bottom). The bottom row (y = 8) holds the gates.
 #
-# The rules are Baba Is You's. A rule is NOUN IS PROPERTY (or NOUN IS NOUN),
-# read left → right or top → bottom; AND joins words ("star and wall is push").
+# The rules are Baba Is You's. A rule is a sentence read left → right or
+# top → bottom; AND joins words ("star and wall is push").
+#   NOUN IS PROPERTY   (star is win)    NOUN IS NOUN   (star is wall)
+#   NOUN READ NOUN     (webb read bio)
 #   Nouns (blue):        WEBB STAR WALL PAPER BIO CV MAIL SLIDE KEY DOOR
-#   Verb (orange):       IS   (and AND)
+#   Verbs (orange):      IS  READ   (and AND)
 #   Properties (green):  YOU  WIN  STOP  PUSH  DEFEAT  SINK  HOT  MELT  OPEN  SHUT
-# Text is always pushable. You win the moment something that is YOU stands on
-# something that is WIN — itself included ("webb is win" while webb is you).
+# Text is always pushable. There are two kinds of goal:
+#   Clear:    something that is YOU stands on something that is WIN — itself
+#             included ("webb is win" while webb is you).
+#   Interact: something that is YOU and READs a kind stands on one of those
+#             objects, which opens what it links to (webb read cv → the CV).
 # NOUN IS NOUN turns one kind of object into another (star is wall).
 # HOT destroys MELT on its tile; OPEN and SHUT destroy each other when they meet,
 # so an OPEN key pushed into a SHUT, STOP door opens it.
 #
 # Words: [WORD, x, y].
 # Objects: kind is one of star, wall, paper, bio, cv, mail, slide, key, door.
-# When an object you win on has a `url`, the win card offers to open it (Enter);
-# `message` is shown instead when there is no link.
-# walls: [x1, y1, x2, y2] — a straight run of wall objects (paper levels).
+#   caption = the small label above it; url + action = what reading it opens;
+#   message = shown instead when there is no link.
+# walls: [x1, y1, x2, y2] — a straight run of wall objects (stage puzzles).
 # ---------------------------------------------------------------------------
 
 # Present on every board, top-left.
@@ -37,14 +42,14 @@ gates:
 # First visit to Home: the welcome screen inside Figure 0.
 welcome:
   label: "Before you start"
-  text: "This site is a small puzzle. Its rules are written as words — [webb is you], [star is win] — and every word can be pushed. Change a sentence and you change what is true; reach a win and a page opens."
+  text: "This site is made of small puzzles whose ideas come from Baba Is You. Of course, you can read everything here without solving them."
   question: "Have you played a puzzle like this before?"
   choices:
-    - "Yes — take me to the map."
-    - "Not yet — show me how (about a minute)."
-    - "Skip the game — I would rather just read."
+    - "Yes (Skip the tutorial)"
+    - "Not yet (Play the tutorial)"
+    - "Skip the puzzles"
 
-# Choice (b) on the welcome screen. Any win clears a lesson.
+# Choice (b) on the welcome screen. Any win or read clears a lesson.
 tutorial:
   - title: Moving
     hint: "Because [webb is you], the keys W A S D move webb. Walk onto the star — [star is win]."
@@ -67,7 +72,14 @@ tutorial:
     wall_column: 10
     objects:
       - { kind: star, x: 14, y: 4 }
-    done: { title: "Tutorial complete.", text: "Every board on this site works the same way, and any sentence you can spell is a rule — even [webb is win]. The gates along the bottom take you from page to page.", action: "To the map →" }
+    done: { title: "Lesson 3 complete.", text: "Reaching a [win] clears a stage.", action: "Next lesson →" }
+  - title: Reading
+    hint: "Other verbs let you do things. Push [paper] up to make [webb read paper], then walk onto the paper to read it."
+    webb: [5, 5]
+    words: [[WEBB, 6, 2], [READ, 7, 2], [PAPER, 8, 5]]
+    objects:
+      - { kind: paper, x: 13, y: 4 }
+    done: { title: "Tutorial complete.", text: "[win] clears a stage, and [read] opens things. Every board on this site works the same way, and the gates along the bottom take you from page to page.", action: "To the map →" }
 
 # One board per page. `here` is the gate drawn as “you are here”;
 # `spawn` is the gate column webb starts on.
@@ -75,7 +87,6 @@ levels:
   home:
     here: home
     spawn: 2
-    hint: "Push [win] up into the gap so that [star is win] holds, then walk onto the star. Gates along the bottom lead to every page."
     words: [[STAR, 6, 1], [IS, 7, 1], [WIN, 8, 3]]
     objects:
       - kind: star
@@ -84,38 +95,41 @@ levels:
         caption: "warm-up"
         label: "The star"
         message: "That is the whole idea. Every board on this site works the same way — and the gates take you around."
-        action: "Done"
 
+  # One READ, three sentences: push it up the column to finish one of them.
   about:
     here: about
     spawn: 5
-    hint: "Push [win] up the column to finish one of the sentences, then walk onto that object — or walk to a gate and press Enter."
-    words: [[BIO, 6, 1], [IS, 7, 1], [CV, 6, 3], [IS, 7, 3], [MAIL, 6, 5], [IS, 7, 5], [WIN, 8, 6]]
+    words: [[WEBB, 6, 1], [BIO, 8, 1], [WEBB, 6, 3], [CV, 8, 3], [WEBB, 6, 5], [MAIL, 8, 5], [READ, 7, 6]]
     objects:
       - { kind: bio, x: 12, y: 1, caption: "Bio", label: "Bio", url: "#bio", action: "Read the bio ↓" }
       - { kind: cv, x: 12, y: 3, caption: "CV", label: "CV", url: "/files/CV.pdf", external: true, action: "Open the CV (PDF) ↗" }
       - { kind: mail, x: 12, y: 5, caption: "Contact", label: "Contact", url: "#contact", action: "Go to contact ↓" }
 
   # A map, as in the game: webb is SELECT and moves only along the paths.
-  # Each level is a selected paper (_publications/*.md with `selected: 1`,
-  # `selected: 2` …); stand on one and press Enter to play its puzzle below.
-  # Every level is open from the start, in any order; clearing one offers the
-  # paper. (A path with `after: n` would stay hidden until level n is cleared.)
+  # Each stage is a selected paper (`selected: true` in _publications/*.md),
+  # numbered by date: node n holds paper [n], and [1] is always the newest.
+  # Stand on one and press Enter to play its puzzle; reading the paper clears it.
+  # A path with `need: n` is drawn only when there is a paper [n]; one with
+  # `after: n` stays hidden until stage n is cleared.
   # A selected paper with no node here is still in the list, just not on the map.
   publications:
     here: publications
     spawn: 9
-    hint: "Walk the paths with W A S D. Stand on any numbered level and press Enter to play it; clearing it opens the paper."
     map:
+      items: papers
+      kind: paper
       rule: [[WEBB, 1, 1], [IS, 2, 1], [SELECT, 3, 1]]    # drawn only — the map has no rules to push
-      nodes:                                              # n = the paper's `selected:` number
+      nodes:
         - { n: 1, x: 9, y: 5 }
         - { n: 2, x: 6, y: 3 }
         - { n: 3, x: 12, y: 3 }
+        - { n: 4, x: 9, y: 2 }
       paths:                                              # from → via … → to, straight runs; gate P is at (9, 8)
         - { from: [9, 8], to: [9, 5] }
-        - { from: [9, 5], via: [[6, 5]], to: [6, 3] }
-        - { from: [9, 5], via: [[12, 5]], to: [12, 3] }
+        - { from: [9, 5], via: [[6, 5]], to: [6, 3], need: 2 }
+        - { from: [9, 5], via: [[12, 5]], to: [12, 3], need: 3 }
+        - { from: [9, 5], to: [9, 2], need: 4 }
       decor:
         - [tree, 1, 4]
         - [tree, 2, 6]
@@ -128,24 +142,26 @@ levels:
         - [tree, 14, 6]
         - [tree, 16, 6]
 
-      # The puzzle behind each level, by paper number. `webb` is where you start;
-      # the whole 18 × 9 board is yours (no gates inside a level).
+      # Each paper's own puzzle, by file name (_publications/<file name>.md), so it
+      # follows the paper when its number changes. A paper without one gets a
+      # plain "push PAPER into [webb read paper]" stage. `webb` is where you start;
+      # the whole 18 × 9 board is yours (no gates inside a stage).
       puzzles:
-        1:   # When to Skip Syndrome Extraction in Surface-GKP Codes
+        "2026-surface-gkp-skip":   # When to Skip Syndrome Extraction in Surface-GKP Codes
           name: "Skip a Round"
           webb: [4, 5]
           words: [[WEBB, 1, 1], [IS, 2, 1], [YOU, 3, 1],
                   [WALL, 1, 7], [IS, 2, 7], [STOP, 3, 7],
-                  [PAPER, 6, 4], [IS, 7, 4],
-                  [WIN, 13, 4]]
+                  [WEBB, 6, 4], [READ, 7, 4],
+                  [PAPER, 13, 4]]
           walls: [[12, 2, 16, 2], [12, 6, 16, 6], [12, 3, 12, 5], [16, 3, 16, 5]]
           objects:
             - { kind: paper, x: 15, y: 4 }
-        2:   # Optimal copy complexity of quantum state cloning
+        "2026-quantum-state-cloning":   # Optimal copy complexity of quantum state cloning
           name: "Copies"
           webb: [4, 7]
           words: [[WEBB, 1, 1], [IS, 2, 1], [YOU, 3, 1],
-                  [PAPER, 7, 4], [IS, 8, 4], [WIN, 9, 4],
+                  [WEBB, 5, 4], [READ, 6, 4], [PAPER, 7, 4],
                   [IS, 4, 5], [STAR, 2, 6],
                   [WALL, 1, 8], [IS, 2, 8], [STOP, 3, 8]]
           walls: [[10, 2, 14, 2], [10, 6, 14, 6], [10, 3, 10, 5], [14, 3, 14, 5], [8, 3, 9, 3], [8, 5, 9, 5]]
@@ -154,7 +170,7 @@ levels:
             - { kind: star, x: 16, y: 1 }
             - { kind: star, x: 16, y: 7 }
             - { kind: star, x: 6, y: 8 }
-        3:   # Need for Coherent Access in Constructing Quantum Cryptography
+        "2026-coherent-access":   # Need for Coherent Access in Constructing Quantum Cryptography
           name: "Need for Access"
           webb: [4, 4]
           words: [[WEBB, 1, 1], [IS, 2, 1], [YOU, 3, 1],
@@ -162,18 +178,44 @@ levels:
                   [AND, 10, 3], [OPEN, 11, 6],
                   [WALL, 1, 8], [IS, 2, 8], [STOP, 3, 8],
                   [DOOR, 5, 8], [IS, 6, 8], [SHUT, 7, 8], [AND, 8, 8], [STOP, 9, 8],
-                  [PAPER, 11, 8], [IS, 12, 8], [WIN, 13, 8]]
+                  [WEBB, 11, 8], [READ, 12, 8], [PAPER, 13, 8]]
           walls: [[13, 2, 17, 2], [13, 6, 17, 6], [13, 3, 13, 3], [13, 5, 13, 5]]
           objects:
             - { kind: door, x: 13, y: 4 }
             - { kind: key, x: 8, y: 4 }
             - { kind: paper, x: 16, y: 4 }
 
-  # Objects come from _talks/*.md files that have `slides:` (newest three).
+  # The same kind of map, out at sea: one stage per talk (_talks/*.md), numbered
+  # by date like the Talks page — [1] is the newest. Reading the slides clears it.
   talks:
     here: talks
     spawn: 12
-    hint: "Push [win] left to make [slide is win], then walk onto the screen — or walk to a gate and press Enter."
-    words: [[SLIDE, 5, 3], [IS, 6, 3], [WIN, 9, 3]]
-    auto: talks
-    slots: [[13, 2], [13, 4], [13, 6]]
+    theme: sea
+    map:
+      items: talks
+      kind: slide
+      rule: [[WEBB, 1, 1], [IS, 2, 1], [SELECT, 3, 1]]
+      nodes:
+        - { n: 1, x: 12, y: 5 }
+        - { n: 2, x: 8, y: 5 }
+        - { n: 3, x: 8, y: 2 }
+        - { n: 4, x: 15, y: 3 }
+      paths:                                              # gate T is at (12, 8)
+        - { from: [12, 8], to: [12, 5] }
+        - { from: [12, 5], to: [8, 5], need: 2 }
+        - { from: [8, 5], to: [8, 2], need: 3 }
+        - { from: [12, 5], via: [[15, 5]], to: [15, 3], need: 4 }
+      decor:
+        - [wave, 1, 4]
+        - [wave, 3, 6]
+        - [wave, 5, 3]
+        - [wave, 10, 2]
+        - [wave, 10, 7]
+        - [wave, 14, 1]
+        - [wave, 16, 6]
+        - [fish, 4, 4]
+        - [fish, 16, 2]
+        - [fish, 6, 7]
+      # Each talk's own puzzle, by file name (_talks/<file name>.md). A talk without
+      # one gets a plain "push SLIDE into [webb read slide]" stage.
+      puzzles: {}

@@ -9,7 +9,7 @@ layout: base
   <header class="post-head">
     <p class="crumbs" data-block="BP-a"><a href="{{ '/blog/' | relative_url }}">Blog</a>{% if cat %} / <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}</p>
     <h1 data-block="BP-b">{{ page.title }}</h1>
-    <p class="meta" data-block="BP-c">{{ page.date | date: "%Y.%m.%d" }} · {{ profile.name }} · {{ minutes }} min read{% if cat %} · Filed under <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}</p>
+    <p class="meta" data-block="BP-c">{{ page.date | date: "%Y.%m.%d" }} | {{ profile.name }} | {{ minutes }} min read{% if cat %} | Filed under <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}</p>
   </header>
 
   {%- if page.series -%}

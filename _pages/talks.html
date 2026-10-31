@@ -10,22 +10,25 @@ redirect_from:
 ---
 {%- comment -%}
   Built from _talks/*.md (one file per talk). A talk dated after today is listed as upcoming.
+  Talks are numbered by date, newest first — [n] is also the stage 0n on the map.
 {%- endcomment -%}
 {%- assign talks = site.talks | sort: "date" | reverse -%}
 {%- assign now = site.time | date: "%s" | plus: 0 -%}
 
 <div class="page-head">
   <h1 data-block="T-a">Talks</h1>
-  <p class="lede" data-block="T-b">Talks and presentations, newest first. Slides are linked where available.</p>
 </div>
 
 {% if site.puzzles %}
 <div class="section--tight" style="margin-top: 44px">
-  {% include board.html level="talks" block="T-c" cap_block="T-d" fig="Figure 0." caption="Talks, as a board. Push [win] left to make [slide is win], then stand on the screen and press Enter for the slides. The gates along the bottom lead to the other pages." %}
+  <p class="prose measure" style="margin: 0" data-block="T-h">Walk to the stage with a talk's number and press Enter to go in; there, you can <em>read</em> its slides.</p>
+  <div style="margin-top: 26px">
+    {% include board.html level="talks" block="T-c" cap_block="T-d" fig="Figure 0." caption="The map of talks. Stand on a stage and press Enter to play it; Esc goes back to the map. Cleared stages stay cleared in this browser. The gates along the bottom lead to the other pages." %}
+  </div>
 </div>
 {% endif %}
 
-{%- capture upcoming -%}{% for t in talks %}{% assign ts = t.date | date: "%s" | plus: 0 %}{% if ts > now %}{% include talk.html talk=t %}{% endif %}{% endfor %}{%- endcapture -%}
+{%- capture upcoming -%}{% for t in talks %}{% assign ts = t.date | date: "%s" | plus: 0 %}{% if ts > now %}{% include talk.html talk=t n=forloop.index %}{% endif %}{% endfor %}{%- endcapture -%}
 {% if upcoming != "" %}
 <section class="section" aria-labelledby="h-up" style="max-width: 760px; margin-top: 56px" data-block="T-e">
   <h2 id="h-up" class="section-title">Upcoming</h2>
@@ -41,7 +44,7 @@ redirect_from:
     {% if ts <= now %}
       {% assign y = t.date | date: "%Y" %}
       {% if y != last_year %}<p class="year-label">{{ y }}</p>{% assign last_year = y %}{% endif %}
-      {% include talk.html talk=t %}
+      {% include talk.html talk=t n=forloop.index %}
     {% endif %}
   {% endfor %}
 </section>

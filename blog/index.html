@@ -19,10 +19,10 @@ nav: blog
       {%- assign words = post.content | number_of_words -%}
       <article class="card" data-block="B-d" aria-labelledby="post-{{ forloop.index }}">
         <h2 id="post-{{ forloop.index }}"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
-        <p class="meta">{{ post.date | date: "%Y.%m.%d" }} · {{ profile.name }} · {{ words | divided_by: 200 | plus: 1 }} min read{% if post.series %} · Series: {{ post.series }}{% endif %}</p>
+        <p class="meta">{{ post.date | date: "%Y.%m.%d" }} | {{ profile.name }} | {{ words | divided_by: 200 | plus: 1 }} min read{% if post.series %} | Series: {{ post.series }}{% endif %}</p>
         <div class="card__excerpt">{{ post.excerpt }}</div>
         <p class="more" style="margin-top: 6px"><a href="{{ post.url | relative_url }}">Continue reading →</a></p>
-        <p class="meta card__foot">{% if cat %}Filed under <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}{% if post.tags.size > 0 %} · Tags: {{ post.tags | join: ", " }}{% endif %}</p>
+        <p class="meta card__foot">{% if cat %}Filed under <a href="{{ '/blog/archive/' | relative_url }}#cat-{{ cat | slugify }}">{{ cat }}</a>{% endif %}{% if post.tags.size > 0 %}{% if cat %} | {% endif %}Tags: {{ post.tags | join: ", " }}{% endif %}</p>
       </article>
       {% else %}
       <p class="empty">No posts yet.</p>

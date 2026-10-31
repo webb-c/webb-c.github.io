@@ -29,16 +29,16 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | 블록 | 내용 | 고치는 곳 |
 | --- | --- | --- |
 | H-a | 이름 | `_data/profile.yml` › `name:` |
-| H-b | 이름 아래 한 줄 (현재 비어 있음) | `_data/profile.yml` › `tagline:` |
-| H-c | "This site is also a small puzzle…" | `index.html` › `data-block="H-c"` 줄의 문장 |
-| H-d | Affiliation / Contact / Elsewhere | 값은 `_data/profile.yml` › `affiliation:`, `email:`, `links:` / 칸 구성은 `index.html` › `H-d` |
+| H-d | Affiliation / Contact / Elsewhere (Scholar \| GitHub) | 값은 `_data/profile.yml` › `affiliation:`, `email:`, `links:` / 칸 구성은 `index.html` › `H-d` |
 | H-e, H-f | 퍼즐판 / 그 아래 캡션 | 판 내용은 `_data/puzzles.yml` › `levels: home:` / 캡션은 `index.html` › `include board.html … caption="…"` |
 | H-g | "How this site works" 본문 | `index.html` › `H-g` 안의 `<p>` 문단 |
 | H-h | 오른쪽 작은 설명 | `index.html` › `H-h` 안의 `<p>` |
 | H-i | 1 About (짧은 소개) | `_data/profile.yml` › `bio:` |
-| H-j | 2 Selected publications | `_publications/*.md`에서 `selected: 1, 2, …`가 있는 논문만, 번호 순 |
+| H-j | 2 Selected publications | `_publications/*.md`에서 `selected: true`인 논문만, 날짜 최신순 ([1]이 가장 최근) |
 | H-k | 3 Talks (최신 3개) | `_talks/*.md` (개수는 `index.html` › H-k의 `limit: 3`) |
-| H-l | 4 From the blog (최신 3개) | `_posts/*.md`의 `title`, `description` (개수는 H-l의 `limit: 3`) |
+| H-m | 4 News | `_data/news.yml` (`when`, `text`; 최신이 위) |
+| H-l | 5 From the blog (최신 3개) | `_posts/*.md`의 `title`, `description` (개수는 H-l의 `limit: 3`) |
+| — | H-i ~ H-l 오른쪽의 "More about me →" 등 | 각 섹션의 `<aside class="split__aside split__aside--more">` (데스크톱은 오른쪽 사이드 노트, 좁은 화면에서는 섹션 아래) |
 | — | 섹션 순서 · 번호 · 섹션 제목 | `index.html`에서 `<section>` 덩어리째 위아래로 옮기고 `<span class="num">` 숫자 수정 |
 
 ### About — `_pages/about.html`
@@ -46,12 +46,11 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | 블록 | 내용 | 고치는 곳 |
 | --- | --- | --- |
 | A-a | "About me" 제목 | `_pages/about.html` › `A-a` |
-| A-b | 이름 · 직함, 소속 · 지역 | `_data/profile.yml` › `name`, `role`, `affiliation`, `location` |
 | A-c | CV / Email / Scholar / GitHub 버튼 | 링크는 `_data/profile.yml` › `links:`, `email:` / 버튼 추가·삭제는 `about.html` › `A-c` |
 | — | 사진 (현재 숨김) | `about.html` 위쪽 `{%- comment -%}` … `{%- endcomment -%}` 블록에서 `<img …>` 한 줄만 남기고 나머지(주석 표시 두 줄과 `PHOTO —` 설명)를 지우면 `images/profile.png`가 보임. 다른 사진은 `images/`에 넣고 `src`의 파일명 수정 |
-| A-d, A-e | 퍼즐판 / 캡션 | `_data/puzzles.yml` › `levels: about:` (Bio·CV·Contact 오브젝트와 링크) / 캡션은 `about.html` › `caption="…"` |
+| A-d, A-e | 퍼즐판 / 캡션 | `_data/puzzles.yml` › `levels: about:` (Bio, CV, Contact 오브젝트와 링크; `read`를 밀어 올려 `webb read …`를 만듦) / 캡션은 `about.html` › `caption="…"` |
 | A-f | 1 Bio 본문 | 첫 문단은 `_data/profile.yml` › `bio:` (Home과 공유). 더 긴 글은 `about.html` › `<!-- Add more paragraphs here -->` 자리에 `<p>…</p>` 추가 |
-| A-g | Interests / Recent topics | `_data/profile.yml` › `interests:`, `recent_topics:` (한 줄에 `- "…"` 하나씩) |
+| A-g | Recent topics | `_data/profile.yml` › `recent_topics:` (한 줄에 `- "…"` 하나씩) |
 | A-h | 2 Research experience | `_data/profile.yml` › `experience:` (`dates`, `title`, `detail`; 최신이 위) |
 | A-i | 3 Education | `_data/profile.yml` › `education:` (`dates`, `title`, 선택 `detail`) |
 | A-j | 4 Contact | 값은 `_data/profile.yml` › `email`, `affiliation`, `location`, `links:` (`cv_updated:`가 "(updated …)" 문구) / 항목 추가는 `about.html` › `A-j`의 `<dt>…</dt><dd>…</dd>` |
@@ -60,12 +59,13 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 
 | 블록 | 내용 | 고치는 곳 |
 | --- | --- | --- |
-| P-a, P-b | 제목 / 소개 문장 | `_pages/publications.html` › `P-a`, `P-b` |
-| P-c, P-d | "Selected" 제목 / 지도 설명 문단 | `publications.html` › `P-c`, `P-d` |
-| P-e, P-f | 논문 지도 / 캡션 | `_data/puzzles.yml` › `levels: publications: map:` — `nodes`(레벨 위치, `n` = 논문의 `selected` 번호), `paths`(길), `decor`(나무), `puzzles: 1: 2: 3:`(레벨별 퍼즐) / 캡션은 `publications.html` › `caption="…"` |
-| P-g | Selected 목록 + 요약 | 각 논문 파일의 `selected:`, `summary:` |
-| P-h | "All papers" + 필터 버튼 | `publications.html` › `P-h` (버튼은 `type:` 값 preprint / journal / conference 기준으로 자동 생성) |
+| P-a | 제목 | `_pages/publications.html` › `P-a` |
+| P-c, P-d | "Selected papers" 제목 / 지도 설명 문단 | `publications.html` › `P-c`, `P-d` |
+| P-e, P-f | 논문 지도 / 캡션 | `_data/puzzles.yml` › `levels: publications: map:` — `nodes`(스테이지 위치, `n` = 논문 번호 [n]), `paths`(길, `need: n`이면 논문 [n]이 있을 때만 보임), `decor`(나무), `puzzles:`(논문별 퍼즐, 키는 논문 파일 이름) / 캡션은 `publications.html` › `caption="…"` |
+| P-g | Selected 목록 | 각 논문 파일의 `selected: true` (번호는 날짜 최신순으로 자동) |
+| P-h | "Recent publications" + 필터 버튼 | `publications.html` › `P-h` (버튼은 `type:` 값 preprint / journal / conference 기준으로 자동 생성) |
 | P-i | 연도별 전체 목록 | `_publications/*.md` 전부 (`date:`의 연도로 묶임) |
+| P-j | "You can see the full list of papers on Google Scholar." | `publications.html` › `P-j` (링크는 `_data/profile.yml` › `links: scholar:`) |
 
 **논문 하나 = `_publications/파일.md` 하나.** 맨 위 `---` 사이 항목:
 
@@ -74,9 +74,9 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | `title`, `short_title` | 제목 / 지도·퍼즐에 쓰는 짧은 이름 |
 | `authors` | `["A", "B", "Vaughn Sohn"]` — `profile.yml`의 `name`과 같은 이름은 자동으로 굵게 |
 | `venue`, `date`, `type` | 학회·저널 이름 / 날짜(정렬·연도) / `preprint`·`journal`·`conference` |
-| `selected` | 숫자를 주면 Selected [n] + 지도 레벨 n (지도에 띄우려면 `puzzles.yml`의 `nodes`·`paths`·`puzzles`에도 n 추가) |
-| `arxiv`, `doi`, `published`, `pdf`, `code` | 링크 버튼 (arXiv · PDF · Published · Code) |
-| `summary`, `bibtex` | Selected 목록의 요약 / 접히는 BibTeX 상자 |
+| `selected` | `true`면 Selected papers + 지도 스테이지. 번호 [1], [2] …는 `date` 최신순으로 자동이라 새 논문이 [1]이 됨. 논문 전용 퍼즐은 `puzzles.yml` › `puzzles:`에 파일 이름(예: `"2026-surface-gkp-skip"`)으로 추가 (없으면 기본 퍼즐) |
+| `arxiv`, `doi`, `published`, `pdf`, `code` | 링크 버튼 (arXiv, PDF, Published, Code) |
+| `summary`, `bibtex` | 요약 (현재 사이트에 표시 안 함) / 접히는 BibTeX 상자 |
 
 논문 한 줄의 모양(저자 표기, 링크 버튼 종류)은 `_includes/paper-ref.html`.
 
@@ -84,20 +84,20 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 
 | 블록 | 내용 | 고치는 곳 |
 | --- | --- | --- |
-| T-a, T-b | 제목 / 소개 문장 | `_pages/talks.html` › `T-a`, `T-b` |
-| T-c, T-d | 퍼즐판 / 캡션 | `_data/puzzles.yml` › `levels: talks:` (화면 오브젝트는 `slides:`가 있는 최신 발표 3개에서 자동 생성) / 캡션은 `talks.html` › `caption="…"` |
+| T-a | 제목 | `_pages/talks.html` › `T-a` |
+| T-h | 지도 설명 문단 | `talks.html` › `T-h` |
+| T-c, T-d | 발표 지도(바다) / 캡션 | `_data/puzzles.yml` › `levels: talks: map:` — 발표 하나 = 스테이지 하나, 번호 [1]은 가장 최근 발표. `nodes`, `paths`, `decor`(파도, 물고기), `puzzles:`(발표별 퍼즐, 키는 발표 파일 이름) / 캡션은 `talks.html` › `caption="…"` |
 | T-e | Upcoming (오늘 이후 날짜의 발표) | 자동 — 발표 파일의 `date:` |
 | T-f | Past (연도별) | 자동 |
-| T-g | 발표 한 개의 모양 | `_includes/talk.html` |
+| T-g | 발표 한 개의 모양 ([n] 번호 포함) | `_includes/talk.html` |
 
-**발표 하나 = `_talks/파일.md` 하나.** 항목: `title`(발표 제목, 비우면 행사명 표시), `event`(행사명), `short_title`(퍼즐판용), `date`(정렬용 실제 날짜), `when`(화면에 보이는 날짜 글자), `location`, `slides`, `video`, `paper`. `---` 아래에 쓴 본문은 발표 설명으로 나옵니다. 슬라이드는 `slides/폴더명/`에 넣고 `slides: "/slides/폴더명/"`.
+**발표 하나 = `_talks/파일.md` 하나.** 항목: `title`(발표 제목, 비우면 행사명 표시), `event`(행사명), `short_title`(퍼즐판용), `date`(정렬과 번호 [n]에 쓰는 실제 날짜), `when`(화면에 보이는 날짜 글자), `location`, `slides`, `video`, `paper`. `---` 아래에 쓴 본문은 발표 설명으로 나옵니다. 슬라이드는 `slides/폴더명/`에 넣고 `slides: "/slides/폴더명/"`.
 
 ### Blog — `blog/index.html`, `_pages/blog-archive.html`, `_layouts/post.html`
 
 | 블록 | 내용 | 고치는 곳 |
 | --- | --- | --- |
-| B-a | "Blog" 제목 + "Notes on research…" | `_includes/blog-head.html` (블로그 첫 화면과 All posts 페이지가 공유하는 파일) |
-| B-b | "No puzzles in here…" | `_includes/blog-head.html` › `B-b` |
+| B-a | "Blog" 제목 + "My Korean blog of notes…" | `_includes/blog-head.html` (블로그 첫 화면과 All posts 페이지가 공유하는 파일) |
 | B-c | Latest / All posts / Series / RSS 탭 | `_includes/blog-head.html` › `<nav class="blog-nav">` |
 | B-d | 글 카드 (제목·날짜·발췌·카테고리·태그) | 내용은 각 글 (발췌 = 글의 첫 문단) / 카드 모양은 `blog/index.html` › `B-d` |
 | B-e | 페이지 넘기기 | 한 페이지당 글 수는 `_config.yml` › `paginate:` |
@@ -119,11 +119,12 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | 모든 판 왼쪽 위 `WEBB IS YOU` | `you:` |
 | 아래쪽 게이트 (H A P T B) | `gates:` (`x`가 칸 위치, `url`이 이동할 주소) |
 | 첫 방문 화면 문구 · 선택지 | `welcome:` |
-| 튜토리얼 3단계 | `tutorial:` |
-| 페이지별 판 | `levels:` › `home:` / `about:` / `publications:` / `talks:` — `words`(단어 블록 `[단어, x, y]`), `objects`(별·CV 등), `hint`(판 아래 힌트), `spawn`(시작 위치) |
+| 튜토리얼 4단계 (이동, 밀기, 규칙 깨기, 읽기) | `tutorial:` |
+| 페이지별 판 | `levels:` › `home:` / `about:` / `publications:` / `talks:` — `words`(단어 블록 `[단어, x, y]`), `objects`(별, CV 등; `caption`은 오브젝트 위 이름), `spawn`(시작 위치) |
 | 판 좌표 | 18 × 9칸, x = 0–17(왼→오), y = 0–8(위→아래). 맨 아랫줄 y = 8은 게이트 자리 |
-| 게임 규칙 자체 (새 단어, 새 속성) | `assets/js/puzzle.js` |
-| 전체 화면(F 키) · 게이트로 이동할 때 퍼즐판 위치 유지 | `assets/js/puzzle.js` › `full screen and gate hops` 부분 / 전체 화면 모양은 `assets/css/site.css` › `Full screen (F)` |
+| 클리어 / 상호작용 | 클리어: `you`인 것이 `win`인 것과 만남. 상호작용: `webb read bio`처럼 `you`인 것이 `read`하는 오브젝트에 올라서면 그 링크가 열림. 논문·발표 스테이지는 `webb read paper` / `webb read slide`로 읽으면 클리어 |
+| 게임 규칙 자체 (새 단어, 새 동사, 새 속성) | `assets/js/puzzle.js` |
+| 전체 화면(F 키), 게이트로 이동할 때 퍼즐판 위치 유지 | `assets/js/puzzle.js` › `full screen and gate hops` 부분 / 전체 화면 모양은 `assets/css/site.css` › `Full screen (F)` |
 | 판 그림 아래 캡션 | 각 페이지의 `{% include board.html … caption="…" %}` |
 
 ### 기타

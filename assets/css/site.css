@@ -327,12 +327,12 @@ code, pre, kbd { font-family: var(--mono); }
 .tile--wall.is-solid .tile__sprite { color: var(--ink); opacity: 1; }
 .tile--wall svg .fill { fill: var(--board); }
 .tile__ring { position: absolute; inset: 6%; border: 1.5px dashed var(--o-line); border-radius: 50%; display: none; animation: ring 1.4s steps(1, end) infinite; }
-.tile.is-win .tile__ring, .tile.is-read .tile__ring { display: block; }
-.tile.is-read .tile__ring { border-color: var(--v-line); }
+.tile.is-win .tile__ring, .tile.is-use .tile__ring { display: block; }
+.tile.is-use .tile__ring { border-color: var(--v-line); }
 @keyframes ring { 0% { inset: 6%; } 50% { inset: 2%; } }
-/* "win" / "read" under an object; its name above it, like the gate labels */
+/* "win" / "read" / "write" under an object; its name above it, like the gate labels */
 .tile__tag { position: absolute; left: -80%; right: -80%; top: 94%; text-align: center; font: 600 1.3cqw var(--serif); color: var(--win-ink); white-space: nowrap; }
-.tile.is-read .tile__tag { color: var(--read-ink); font-style: italic; }
+.tile.is-use .tile__tag { color: var(--read-ink); font-style: italic; }
 .tile__cap { position: absolute; left: 50%; bottom: 96%; transform: translateX(-50%); padding: 0.15cqw 0.6cqw; font: 1.12cqw var(--sans); color: var(--sub); white-space: nowrap; }
 .tile__cap:empty { display: none; }
 

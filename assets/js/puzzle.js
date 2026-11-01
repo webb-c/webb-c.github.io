@@ -3,16 +3,18 @@
  * Publications and Talks.
  *
  * Rules follow Baba Is You:
- *  - A rule is NOUN IS PROPERTY, NOUN IS NOUN or NOUN READ NOUN, read
- *    left → right or top → bottom. AND joins nouns or properties
+ *  - A rule is NOUN IS PROPERTY, NOUN IS NOUN, NOUN READ NOUN or NOUN WRITE
+ *    NOUN, read left → right or top → bottom. AND joins nouns or properties
  *    ("star and wall is push").
  *  - Text is always PUSH. Objects are walkable unless they are STOP or PUSH.
  *  - YOU: you move every object that is YOU, all at once.
  *  - Clearing: the moment an object that is YOU shares a tile with an object
  *    that is WIN — including itself (webb is you + webb is win) — you win.
+ *    On a paper's or talk's stage, that clears the stage.
  *  - Interacting: an object that is YOU and READs a kind (webb read bio)
- *    opens what such an object links to when it steps onto one. On a paper's
- *    or talk's stage, reading the paper / slides is what clears the stage.
+ *    opens what such an object links to when it steps onto one. Mail is
+ *    written, not read (webb write mail). Reading clears nothing: on a stage
+ *    you can read the paper / slides without solving it.
  *  - STOP blocks, PUSH gets pushed, DEFEAT destroys YOU objects on its tile,
  *    SINK destroys itself and whatever shares its tile, HOT destroys MELT
  *    objects on its tile, and an OPEN object meeting a SHUT one destroys both
@@ -25,7 +27,7 @@
  * Publications and Talks are maps instead, as in the game: webb is SELECT and
  * moves only along opened paths and open stages. Each stage (01, 02 …) is a
  * selected paper or a talk with its own puzzle; Enter plays it. Clearing a
- * stage offers the paper or slides, and reveals the hidden paths next to it,
+ * stage (reaching a WIN) offers the paper or slides too, and reveals the hidden paths next to it,
  * which open the stages they reach. Cleared stages are remembered in this browser.
  *
  * Board contents live in _data/puzzles.yml; _includes/board.html turns them
@@ -39,12 +41,18 @@
   // set just before a gate changes page: where the board sat on screen and whether it was full screen
   var KEY_HOP = 'webb.hop';
   var NOUNS = { WEBB: 'webb', STAR: 'star', WALL: 'wall', PAPER: 'paper', BIO: 'bio', CV: 'cv', MAIL: 'mail', SLIDE: 'slide', KEY: 'key', DOOR: 'door' };
-  var VERBS = { IS: true, READ: true };
+  var VERBS = { IS: true, READ: true, WRITE: true };
+  // verbs that act on things (NOUN READ NOUN), and what you do with each kind: everything else is read
+  var ACTS = { READ: true, WRITE: true };
+  var VERB_FOR = { mail: 'WRITE' };
+  function verbFor(kind) { return VERB_FOR[kind] || 'READ'; }
   var IDLE = 'Move [you] to go to another page.';
-  // a stage with no puzzle of its own in puzzles.yml gets this one: push the noun up into the sentence
+  // a stage with no puzzle of its own in puzzles.yml gets this one: push WIN up into
+  // [star is win] to clear it; the paper / slides at the bottom can be read any time
   function plainLevel(kind) {
-    return { name: 'Read me', webb: [3, 5], objects: [{ kind: kind, x: 13, y: 3 }],
-      words: [['WEBB', 1, 1], ['IS', 2, 1], ['YOU', 3, 1], ['WEBB', 6, 3], ['READ', 7, 3], [kind.toUpperCase(), 8, 6]] };
+    return { name: 'First steps', webb: [3, 5], objects: [{ kind: 'star', x: 13, y: 3 }, { kind: kind, x: 16, y: 8 }],
+      words: [['WEBB', 1, 1], ['IS', 2, 1], ['YOU', 3, 1], ['STAR', 6, 3], ['IS', 7, 3], ['WIN', 8, 6],
+        ['WEBB', 11, 8], ['READ', 12, 8], [kind.toUpperCase(), 13, 8]] };
   }
 
   var store = {
@@ -54,7 +62,7 @@
   var boards = [];
   function puzzlesOff() { return store.get(KEY_OFF) === '1'; }
   function setPuzzlesOff(off) { store.set(KEY_OFF, off ? '1' : null); boards.forEach(function (b) { b.render(); }); }
-  // cleared stages, as "papers:<file name>" / "talks:<file name>", so a stage stays cleared when its number changes
+  // cleared stages, as "papers:<n>" / "talks:<n>": like its puzzle, a stage's cleared mark goes with its number
   function cleared() { return (store.get(KEY_CLEARED) || '').split(',').filter(Boolean); }
   function markCleared(id) { var c = cleared(); if (c.indexOf(id) < 0) { c.push(id); store.set(KEY_CLEARED, c.join(',')); } }
   function two(n) { return (n < 10 ? '0' : '') + n; }
@@ -106,9 +114,10 @@
 
   // --- rules -------------------------------------------------------------------
   // Read every sentence on the board. Returns which word tiles are part of a
-  // rule, each kind's properties, noun → noun transformations and what each kind reads.
+  // rule, each kind's properties, noun → noun transformations and what each kind
+  // reads or writes (acts[webb][bio].READ).
   function readRules(ents) {
-    var at = {}, active = {}, props = {}, turn = {}, keep = {}, reads = {}, list = [];
+    var at = {}, active = {}, props = {}, turn = {}, keep = {}, acts = {}, list = [];
     ents.forEach(function (e) { if (e.t === 'w' && !e.dead) at[e.x + ',' + e.y] = e; });
     var get = function (x, y) { return at[x + ',' + y]; };
     ents.forEach(function (start) {
@@ -123,8 +132,8 @@
         var verb = get(cur.x + d[0], cur.y + d[1]);
         if (!verb || !VERBS[verb.w]) return;
         var comp = [], c = get(verb.x + d[0], verb.y + d[1]), tail = [verb];
-        // you READ things (nouns), never properties
-        while (c && !VERBS[c.w] && c.w !== 'AND' && (verb.w !== 'READ' || NOUNS[c.w])) {
+        // you READ / WRITE things (nouns), never properties
+        while (c && !VERBS[c.w] && c.w !== 'AND' && (!ACTS[verb.w] || NOUNS[c.w])) {
           comp.push(c); tail.push(c);
           a = get(c.x + d[0], c.y + d[1]); n = a && get(c.x + 2 * d[0], c.y + 2 * d[1]);
           if (a && a.w === 'AND' && n && !VERBS[n.w] && n.w !== 'AND') { tail.push(a); c = n; } else break;
@@ -135,18 +144,20 @@
           var k = NOUNS[s.w];
           comp.forEach(function (w) {
             list.push(s.w + ' ' + verb.w + ' ' + w.w);
-            if (verb.w === 'READ') { reads[k] = reads[k] || {}; reads[k][NOUNS[w.w]] = true; }
+            if (ACTS[verb.w]) { acts[k] = acts[k] || {}; (acts[k][NOUNS[w.w]] = acts[k][NOUNS[w.w]] || {})[verb.w] = true; }
             else if (NOUNS[w.w]) { if (NOUNS[w.w] === k) keep[k] = true; else (turn[k] = turn[k] || []).push(NOUNS[w.w]); }
             else { props[k] = props[k] || {}; props[k][w.w] = true; }
           });
         });
       });
     });
-    return { active: active, props: props, turn: turn, keep: keep, reads: reads, list: list };
+    return { active: active, props: props, turn: turn, keep: keep, acts: acts, list: list };
   }
   function has(R, kind, p) { return !!(R.props[kind] && R.props[kind][p]); }
-  // does something that is YOU read this kind of object?
-  function readByYou(R, kind) { return Object.keys(R.reads).some(function (k) { return R.reads[k][kind] && has(R, k, 'YOU'); }); }
+  // does `who` do with this kind of object what one does with it (read a paper, write mail)?
+  function acts(R, who, kind) { return !!(R.acts[who] && R.acts[who][kind] && R.acts[who][kind][verbFor(kind)]); }
+  // …and does something that is YOU?
+  function usedByYou(R, kind) { return Object.keys(R.acts).some(function (k) { return acts(R, k, kind) && has(R, k, 'YOU'); }); }
   // an OPEN object and a SHUT one cancel out when they meet
   function opens(R, a, b) {
     return a.t === 'o' && b.t === 'o' && ((has(R, a.kind, 'OPEN') && has(R, b.kind, 'SHUT')) || (has(R, a.kind, 'SHUT') && has(R, b.kind, 'OPEN')));
@@ -247,8 +258,8 @@
     return { id: id, kind: M.kind || 'paper', item: item, nodes: nodes, paths: paths, decor: M.decor || [], rule: M.rule || [], puzzles: M.puzzles || {} };
   };
   Board.prototype.isDone = function (n) {
-    var M = this.def.map, it = M.item(n);
-    return !!it && cleared().indexOf(M.id + ':' + it.key) >= 0;
+    var M = this.def.map;
+    return !!M.item(n) && cleared().indexOf(M.id + ':' + n) >= 0;
   };
 
   // Which paths are revealed, which stages are open or cleared, and where webb may walk.
@@ -269,7 +280,7 @@
     return this.def.map.nodes.filter(function (nd) { return nd.open && nd.x === c.x && nd.y === c.y; })[0] || null;
   };
   Board.prototype.nodeFor = function (n) { return this.def.map.nodes.filter(function (nd) { return nd.n === n; })[0]; };
-  Board.prototype.puzzleFor = function (n) { var M = this.def.map; return M.puzzles[this.nodeFor(n).item.key] || plainLevel(M.kind); };
+  Board.prototype.puzzleFor = function (n) { var M = this.def.map; return M.puzzles[n] || plainLevel(M.kind); };
 
   Board.prototype.build = function () {
     var fig = this.fig, mount = fig.querySelector('.board__mount'), self = this;
@@ -488,7 +499,7 @@
     var sig = hit ? hit.sig : '';
     if (sig && sig !== g.winSig && !quiet) {
       if (g.stage === 'tut') g.card = Object.assign({ lesson: true, rule: hit.rule }, (this.D.tutorial[g.lesson - 1] || {}).done || { title: 'Done.' });
-      else if (g.stage === 'level') g.card = this.levelCard(hit);
+      else if (g.stage === 'level' && hit.win) g.card = this.levelCard(hit);
       else g.card = hit;
     }
     g.winSig = sig;
@@ -496,23 +507,24 @@
   };
 
   // What does a YOU object stand on? A WIN object clears the stage; an object
-  // that it READs is an interaction. Prefer an object other than itself — an
-  // object that is both YOU and WIN wins on its own.
+  // that it reads (or writes) is an interaction, which clears nothing. Prefer an
+  // object other than itself — an object that is both YOU and WIN wins on its own.
   Board.prototype.findHit = function (R, yous) {
-    var all = this.alive().filter(function (e) { return e.t === 'o'; }), best = null, stage = this.g.stage, map = this.def.map;
+    var all = this.alive().filter(function (e) { return e.t === 'o'; }), best = null, stage = this.g.stage, level = this.g.level, map = this.def.map;
     yous.forEach(function (y) {
       all.forEach(function (o) {
         if (o.x !== y.x || o.y !== y.y) return;
         var self = o === y, noun = o.kind.toUpperCase(), who = cap(o.kind), c = null;
         if (has(R, o.kind, 'WIN')) {
-          if (self) c = { sig: o.id + ':self', rule: '[' + noun + ' is you] [' + noun + ' is win]', title: who + ' is you, and ' + o.kind + ' is win.',
+          if (self) c = { win: true, sig: o.id + ':self', rule: '[' + noun + ' is you] [' + noun + ' is win]', title: who + ' is you, and ' + o.kind + ' is win.',
             text: 'Being the goal yourself counts — that is how the rules work. Nothing opens here, but you win.' };
-          else c = { sig: o.id + ':win', rule: '[' + noun + ' is win]', title: (o.label || who) + ' is win.', text: o.message || (o.url ? '' : 'You reached it.'),
+          else c = { win: true, sig: o.id + ':win', rule: '[' + noun + ' is win]', title: (o.label || who) + ' is win.', text: o.message || (o.url ? '' : 'You reached it.'),
             url: o.url, external: !!o.external, action: o.action || 'Open →' };
-        } else if (!self && R.reads[y.kind] && R.reads[y.kind][o.kind]) {
+        } else if (!self && acts(R, y.kind, o.kind)) {
           // on a page board only things with something to show; on a stage only its paper / slides
-          var counts = stage === 'tut' || (stage === 'level' ? o.kind === map.kind : !!(o.url || o.message));
-          if (counts) c = { sig: o.id + ':read', rule: '[' + y.kind.toUpperCase() + ' read ' + noun + ']', title: o.label || who, text: o.message || '',
+          var rule = '[' + y.kind.toUpperCase() + ' ' + verbFor(o.kind).toLowerCase() + ' ' + noun + ']', it = stage === 'level' && o.kind === map.kind && map.item(level);
+          if (it) c = { sig: o.id + ':read', rule: rule, title: it.title, text: 'Reading it does not clear the stage; reach a [win] for that.', links: it.links || [] };
+          else if (stage === 'tut' || (stage !== 'level' && (o.url || o.message))) c = { sig: o.id + ':read', rule: rule, title: o.label || who, text: o.message || '',
             url: o.url, external: !!o.external, action: o.action || 'Open →' };
         }
         if (c && (!best || (best.sig.indexOf(':self') > 0 && c.sig.indexOf(':self') < 0))) best = c;
@@ -521,9 +533,9 @@
     return best;
   };
 
-  // Clearing a stage (reading its paper / slides, or any win) offers what it links to.
+  // Clearing a stage (reaching a WIN) also offers its paper / slides.
   Board.prototype.levelCard = function (hit) {
-    var n = this.g.level, M = this.def.map, it = this.nodeFor(n).item, id = M.id + ':' + it.key, first = cleared().indexOf(id) < 0;
+    var n = this.g.level, M = this.def.map, it = this.nodeFor(n).item, id = M.id + ':' + n, first = cleared().indexOf(id) < 0;
     var more = first && M.paths.some(function (l) { return l.after === n; });
     markCleared(id);
     return { level: true, sig: hit.sig, rule: hit.rule, title: 'Stage ' + two(n) + ' cleared.', text: it.title, links: it.links || [],
@@ -586,8 +598,8 @@
     var dirs = { w: [0, -1], arrowup: [0, -1], s: [0, 1], arrowdown: [0, 1], a: [-1, 0], arrowleft: [-1, 0], d: [1, 0], arrowright: [1, 0] };
     var g = this.g;
     if (k === 'escape') {
+      if (g.card && !g.card.lesson && !g.card.level) { g.card = null; this.render(); return true; }
       if (g.stage === 'level') { this.toMap(); return true; }
-      if (g.card && !g.card.lesson) { g.card = null; this.render(); return true; }
       if (this.isFull()) { this.setFull(false); return true; }
       return false;
     }
@@ -661,9 +673,9 @@
     var kind = this.def.map ? this.def.map.kind : '';
     if (intro) status = 'Use W and S (or ↑ ↓) to pick an answer, then press Enter — or just click one.';
     else if (g.card && g.card.level) status = g.card.links.length ? 'Enter opens it; Esc goes back to the map.' : 'Press Enter to go back to the map.';
-    else if (g.card) status = g.card.lesson ? 'Press Enter to continue.' : g.card.url ? 'Enter opens it; Esc or any move keeps playing.' : 'Esc or any move keeps playing.';
+    else if (g.card) status = g.card.lesson ? 'Press Enter to continue.' : g.card.url || (g.card.links || []).length ? 'Enter opens it; Esc or any move keeps playing.' : 'Esc or any move keeps playing.';
     else if (tut) { status = ((this.D.tutorial || [])[g.lesson - 1] || {}).hint || ''; big = true; }
-    else if (level) status = 'Make [webb read ' + kind + '], then walk onto the ' + (kind === 'slide' ? 'slides' : kind) + '. Z undoes, R restarts, Esc goes back to the map.';
+    else if (level) status = 'Reach a [win] to clear the stage; [webb read ' + kind + '] lets you read the ' + (kind === 'slide' ? 'slides' : kind) + ' any time. Z undoes, R restarts, Esc goes back to the map.';
     else if (node) status = '[' + node.n + '] ' + esc(node.item.title) + (node.done ? ' (cleared). Press Enter to play it again.' : '. Press Enter to play.');
     else if (gate) status = gate.id === this.def.here ? esc(gate.label) : '';   // another page's gate: just its button
     else if (g.winSig) status = 'Press Enter to see it again.';
@@ -696,13 +708,14 @@
     this.cardFor = c;
     var btns = '';
     if (c.lesson) btns = '<button type="button" class="btn btn--primary" data-card="next"><kbd>Enter</kbd>' + esc(c.action || 'Continue →') + '</button>';
-    else if (c.level) {
-      btns = c.links.map(function (l, i) {
+    else {
+      var links = c.links || (c.url ? [{ url: c.url, label: c.action, external: c.external }] : []);
+      btns = links.map(function (l, i) {
         return '<a class="btn' + (i ? '' : ' btn--primary') + '" data-card="' + (i ? 'link' : 'go') + '" href="' + esc(href(l.url)) + '"' + (l.external ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + (i ? '' : '<kbd>Enter</kbd>') + esc(l.label) + '</a>';
-      }).join('') + '<button type="button" class="btn' + (c.links.length ? '' : ' btn--primary') + '" data-card="map"><kbd>' + (c.links.length ? 'Esc' : 'Enter') + '</kbd>Back to the map</button>';
-    } else {
-      if (c.url) btns += '<a class="btn btn--primary" data-card="go" href="' + esc(href(c.url)) + '"' + (c.external ? ' target="_blank" rel="noopener noreferrer"' : '') + '><kbd>Enter</kbd>' + esc(c.action) + '</a>';
-      btns += '<button type="button" class="btn" data-card="close"><kbd>Esc</kbd>Keep playing</button>';
+      }).join('');
+      // a cleared stage goes back to the map; anything else just closes
+      if (c.level) btns += '<button type="button" class="btn' + (links.length ? '' : ' btn--primary') + '" data-card="map"><kbd>' + (links.length ? 'Esc' : 'Enter') + '</kbd>Back to the map</button>';
+      else btns += '<button type="button" class="btn" data-card="close"><kbd>Esc</kbd>Keep playing</button>';
     }
     el.over.innerHTML = '<div class="board__card" role="dialog" aria-label="' + esc(c.title) + '">' +
       '<span class="rule-line">' + chips(c.rule || '') + '</span>' +
@@ -770,11 +783,11 @@
         n.className = 'tile tile--obj tile--' + e.kind;
         n.querySelector('.tile__sprite').innerHTML = sprite(e.kind);
       }
-      var win = has(R, e.kind, 'WIN'), read = !win && readByYou(R, e.kind);
+      var win = has(R, e.kind, 'WIN'), use = !win && usedByYou(R, e.kind);
       n.classList.toggle('is-win', win);
-      n.classList.toggle('is-read', read);
+      n.classList.toggle('is-use', use);
       n.classList.toggle('is-solid', has(R, e.kind, 'STOP') || has(R, e.kind, 'PUSH'));
-      n.querySelector('.tile__tag').textContent = win ? 'win' : read ? 'read' : '';
+      n.querySelector('.tile__tag').textContent = win ? 'win' : use ? verbFor(e.kind).toLowerCase() : '';
       n.querySelector('.tile__cap').textContent = e.caption || '';
     });
   };

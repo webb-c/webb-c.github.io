@@ -4,8 +4,8 @@
   intro   = "auto" shows the welcome screen on a first visit (Home only)
   caption = figure caption; words in [square brackets] become coloured rule blocks
   Stages: selected papers and talks, newest first — [1] is the newest, the same
-  numbers as on the Publications and Talks pages. `key` is the file name, which
-  is how _data/puzzles.yml gives a paper or talk its own puzzle.
+  numbers as on the Publications and Talks pages. _data/puzzles.yml gives each
+  stage number its own puzzle, whichever paper or talk holds that number.
 {%- endcomment -%}
 {%- if site.puzzles -%}
 {%- assign P = site.data.puzzles -%}
@@ -23,8 +23,8 @@
     "welcome": {{ P.welcome | jsonify }},
     "tutorial": {{ P.tutorial | jsonify }},
     "level": {{ P.levels[include.level] | jsonify }},
-    "papers": [{% for p in selected %}{% if p.doi %}{% assign pub = p.doi | prepend: "https://doi.org/" %}{% else %}{% assign pub = p.published %}{% endif %}{% assign key = p.path | split: "/" | last | split: "." | first %}{% unless forloop.first %}, {% endunless %}{"n": {{ forloop.index }}, "key": {{ key | jsonify }}, "label": {{ p.short_title | default: p.title | jsonify }}, "title": {{ p.title | jsonify }}, "links": [{% if p.arxiv %}{"url": {{ p.arxiv | prepend: "https://arxiv.org/abs/" | jsonify }}, "label": "Read it on arXiv ↗", "short": "arXiv ↗", "external": true}{% endif %}{% if pub %}{% if p.arxiv %}, {% endif %}{"url": {{ pub | jsonify }}, "label": "Published version ↗", "short": "Published ↗", "external": true}{% endif %}]}{% endfor %}],
-    "talks": [{% for t in talks_sorted %}{% assign key = t.path | split: "/" | last | split: "." | first %}{% unless forloop.first %}, {% endunless %}{"n": {{ forloop.index }}, "key": {{ key | jsonify }}, "label": {{ t.short_title | default: t.event | jsonify }}, "title": {% if t.title and t.title != "" %}{{ t.title | jsonify }}{% else %}{{ t.event | jsonify }}{% endif %}, "links": [{% if t.slides %}{% if t.slides contains "://" %}{"url": {{ t.slides | jsonify }}, "label": "Open the slides ↗", "short": "Slides ↗", "external": true}{% else %}{"url": {{ t.slides | jsonify }}, "label": "Open the slides →", "short": "Slides →", "external": false}{% endif %}{% endif %}]}{% endfor %}]
+    "papers": [{% for p in selected %}{% if p.doi %}{% assign pub = p.doi | prepend: "https://doi.org/" %}{% else %}{% assign pub = p.published %}{% endif %}{% unless forloop.first %}, {% endunless %}{"n": {{ forloop.index }}, "label": {{ p.short_title | default: p.title | jsonify }}, "title": {{ p.title | jsonify }}, "links": [{% if p.arxiv %}{"url": {{ p.arxiv | prepend: "https://arxiv.org/abs/" | jsonify }}, "label": "Read it on arXiv ↗", "short": "arXiv ↗", "external": true}{% endif %}{% if pub %}{% if p.arxiv %}, {% endif %}{"url": {{ pub | jsonify }}, "label": "Published version ↗", "short": "Published ↗", "external": true}{% endif %}]}{% endfor %}],
+    "talks": [{% for t in talks_sorted %}{% unless forloop.first %}, {% endunless %}{"n": {{ forloop.index }}, "label": {{ t.short_title | default: t.event | jsonify }}, "title": {% if t.title and t.title != "" %}{{ t.title | jsonify }}{% else %}{{ t.event | jsonify }}{% endif %}, "links": [{% if t.slides %}{% if t.slides contains "://" %}{"url": {{ t.slides | jsonify }}, "label": "Open the slides ↗", "short": "Slides ↗", "external": true}{% else %}{"url": {{ t.slides | jsonify }}, "label": "Open the slides →", "short": "Slides →", "external": false}{% endif %}{% endif %}]}{% endfor %}]
   }
   </script>
 </figure>

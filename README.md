@@ -48,7 +48,7 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | A-a | "About me" 제목 | `_pages/about.html` › `A-a` |
 | A-c | CV / Email / Scholar / GitHub 버튼 | 링크는 `_data/profile.yml` › `links:`, `email:` / 버튼 추가·삭제는 `about.html` › `A-c` |
 | — | 사진 (현재 숨김) | `about.html` 위쪽 `{%- comment -%}` … `{%- endcomment -%}` 블록에서 `<img …>` 한 줄만 남기고 나머지(주석 표시 두 줄과 `PHOTO —` 설명)를 지우면 `images/profile.png`가 보임. 다른 사진은 `images/`에 넣고 `src`의 파일명 수정 |
-| A-d, A-e | 퍼즐판 / 캡션 | `_data/puzzles.yml` › `levels: about:` (Bio, CV, Contact 오브젝트와 링크; `read`를 밀어 올려 `webb read …`를 만듦) / 캡션은 `about.html` › `caption="…"` |
+| A-d, A-e | 퍼즐판 / 캡션 | `_data/puzzles.yml` › `levels: about:` (Bio, CV, Contact 오브젝트와 링크; `read`를 위·아래로 밀어 `webb read bio` / `webb read cv`, `write`를 밀어 올려 `webb write mail`) / 캡션은 `about.html` › `caption="…"` |
 | A-f | 1 Bio 본문 | 첫 문단은 `_data/profile.yml` › `bio:` (Home과 공유). 더 긴 글은 `about.html` › `<!-- Add more paragraphs here -->` 자리에 `<p>…</p>` 추가 |
 | A-g | Recent topics | `_data/profile.yml` › `recent_topics:` (한 줄에 `- "…"` 하나씩) |
 | A-h | 2 Research experience | `_data/profile.yml` › `experience:` (`dates`, `title`, `detail`; 최신이 위) |
@@ -74,7 +74,7 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | `title`, `short_title` | 제목 / 지도·퍼즐에 쓰는 짧은 이름 |
 | `authors` | `["A", "B", "Vaughn Sohn"]` — `profile.yml`의 `name`과 같은 이름은 자동으로 굵게 |
 | `venue`, `date`, `type` | 학회·저널 이름 / 날짜(정렬·연도) / `preprint`·`journal`·`conference` |
-| `selected` | `true`면 Selected papers + 지도 스테이지. 번호 [1], [2] …는 `date` 최신순으로 자동이라 새 논문이 [1]이 됨. 논문 전용 퍼즐은 `puzzles.yml` › `puzzles:`에 파일 이름(예: `"2026-surface-gkp-skip"`)으로 추가 (없으면 기본 퍼즐) |
+| `selected` | `true`면 Selected papers + 지도 스테이지. 번호 [1], [2] …는 `date` 최신순으로 자동이라 새 논문이 [1]이 됨. 퍼즐은 번호에 묶여 있음: `puzzles.yml` › `puzzles:`의 `1:`, `2:` …가 각각 스테이지 [1], [2] …의 퍼즐 (없으면 기본 퍼즐). 새 논문이 나오면 기존 논문들은 다음 번호의 퍼즐로 넘어감 |
 | `arxiv`, `doi`, `published`, `pdf`, `code` | 링크 버튼 (arXiv, PDF, Published, Code) |
 | `summary`, `bibtex` | 요약 (현재 사이트에 표시 안 함) / 접히는 BibTeX 상자 |
 
@@ -122,7 +122,7 @@ Vaughn Sohn의 홈페이지. GitHub Pages(Jekyll)로 빌드됩니다 — `master
 | 튜토리얼 4단계 (이동, 밀기, 규칙 깨기, 읽기) | `tutorial:` |
 | 페이지별 판 | `levels:` › `home:` / `about:` / `publications:` / `talks:` — `words`(단어 블록 `[단어, x, y]`), `objects`(별, CV 등; `caption`은 오브젝트 위 이름), `spawn`(시작 위치) |
 | 판 좌표 | 18 × 9칸, x = 0–17(왼→오), y = 0–8(위→아래). 맨 아랫줄 y = 8은 게이트 자리 |
-| 클리어 / 상호작용 | 클리어: `you`인 것이 `win`인 것과 만남. 상호작용: `webb read bio`처럼 `you`인 것이 `read`하는 오브젝트에 올라서면 그 링크가 열림. 논문·발표 스테이지는 `webb read paper` / `webb read slide`로 읽으면 클리어 |
+| 클리어 / 상호작용 | 클리어: `you`인 것이 `win`인 것과 만남 (스테이지는 이것으로만 클리어). 상호작용: `webb read bio`처럼 `you`인 것이 `read`하는 오브젝트에 올라서면 그 링크가 열림 (클리어 아님). mail만 `write` (`webb write mail`); 어떤 동사를 쓰는지는 `assets/js/puzzle.js` › `VERB_FOR`. 논문·발표 스테이지에서는 별을 `win`으로 만들어 클리어하고, 논문·슬라이드는 언제든 `webb read paper` / `webb read slide`로 읽을 수 있음 |
 | 게임 규칙 자체 (새 단어, 새 동사, 새 속성) | `assets/js/puzzle.js` |
 | 전체 화면(F 키), 게이트로 이동할 때 퍼즐판 위치 유지 | `assets/js/puzzle.js` › `full screen and gate hops` 부분 / 전체 화면 모양은 `assets/css/site.css` › `Full screen (F)` |
 | 판 그림 아래 캡션 | 각 페이지의 `{% include board.html … caption="…" %}` |
